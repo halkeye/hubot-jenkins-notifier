@@ -10,7 +10,9 @@ Notifies about Jenkins build errors via Jenkins Notification Plugin
 _(Coming soon)_
 
 ## Release History
-_(Nothing yet)_
+
+0.1.0 - Initial Release - 2013-07-22
+* Based heavily on the [github/hubot-scripts](http://www.github.com/github/hubot-scripts) version which broke in our infrastructure
 
 ## License
 Copyright (c) 2013 Gavin Mogan
