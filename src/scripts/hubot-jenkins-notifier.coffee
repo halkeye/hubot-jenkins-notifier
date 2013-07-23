@@ -7,6 +7,8 @@
 # Configuration:
 #   Make jenkins hit <HUBOT_URL>:<PORT>/hubot/jenkins-notify?room=<room>
 #   See here: https://wiki.jenkins-ci.org/display/JENKINS/Notification+Plugin
+#   Optional Params:
+#     always_notify=1
 #
 # Commands:
 #   None
@@ -65,6 +67,8 @@ class JenkinsNotifier
           index = @failing.indexOf data.name
           @failing.splice index, 1 if index isnt -1
           @robot.send envelope, "Phew! All is well: #{data.name} build was restored ##{data.build.number} (#{encodeURI(data.build.full_url)})"
+        else if query.always_notify
+          @robot.send envelope, "Successful build: #{data.name} build was completed ##{data.build.number} (#{encodeURI(data.build.full_url)})"
 
 module.exports = (robot) ->
   notifier = new JenkinsNotifier robot

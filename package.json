@@ -1,7 +1,7 @@
 {
   "name": "hubot-jenkins-notifier",
   "description": "Notifies about Jenkins build errors via Jenkins Notification Plugin",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/halkeye/hubot-jenkins-notifier",
   "author": {
     "name": "Gavin Mogan",
