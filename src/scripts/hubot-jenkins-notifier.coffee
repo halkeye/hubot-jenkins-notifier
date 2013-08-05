@@ -40,7 +40,7 @@ class JenkinsNotifier
 
     envelope = {}
     envelope.user = {}
-    envelope.room = query.room if query.room
+    envelope.user.room = envelope.room = query.room if query.room
     envelope.user.type = query.type if query.type
 
     try

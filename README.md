@@ -11,6 +11,9 @@ _(Coming soon)_
 
 ## Release History
 
+0.1.3 - 2013-08-05
+* support hubot-irc adapter
+
 0.1.2 - 2013-07-23
 * allow ```always_notify=1``` cgi parameter to always notify a room even on success
 
