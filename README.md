@@ -1,6 +1,6 @@
 # hubot-jenkins-notifier
 
-Notifies about Jenkins build errors via Jenkins Notification Plugin
+Notifies about Jenkins build errors via [Jenkins Notification Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Notification+Plugin)
 
 ## Getting Started
 1. Install the module: `npm install --save hubot-jenkins-notifier`
