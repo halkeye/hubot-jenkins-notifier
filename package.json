@@ -37,7 +37,9 @@
     "grunt-coffeelint": "~0.0.6",
     "grunt-simple-mocha": "~0.4.0",
     "should": "~1.2.2",
-    "grunt": "~0.4.1"
+    "grunt": "~0.4.1",
+    "supertest": "~0.7.1",
+    "sinon": "~1.7.3"
   },
   "keywords": [
     "hubot"

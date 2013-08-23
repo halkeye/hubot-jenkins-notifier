@@ -1,6 +1,14 @@
 'use strict'
 
-hubot_jenkins_notifier = require('../scripts/hubot-jenkins-notifier.js')
+Hubot = require('hubot')
+Path = require('path')
+request = require('supertest')
+sinon = require('sinon')
+
+adapterPath = Path.join Path.dirname(require.resolve 'hubot'), "src", "adapters"
+robot = Hubot.loadBot adapterPath, "shell", "true", "MochaHubot"
+
+hubot_jenkins_notifier = require('../scripts/hubot-jenkins-notifier.js')(robot)
 
 ###
 ======== A Handy Little Mocha Reference ========
@@ -52,9 +60,35 @@ Should assertions:
   user.should.be.a('object').and.have.property('name', 'tj')
 ###
 
-describe 'Awesome', ()->
-  describe '#of()', ()->
 
-    it 'awesome', ()->
-      hubot_jenkins_notifier.awesome().should.eql('awesome')
+finished_failed_body = {
+  "name":"JobName",
+  "url":"JobUrl",
+  "build":{
+    "number":1,
+    "phase":"FINISHED",
+    "status":"FAILURE",
+    "url":"job/project/5",
+    "full_url":"http://ci.jenkins.org/job/project/5"
+    "parameters":{"branch":"master"}
+  }
+}
+
+describe 'finished-failed', ()->
+  before (done) ->
+    robot.adapter.send = sinon.spy()
+    endfunc = (err, res) ->
+      throw err if err
+      do done
+    request(robot.router)
+      .post("/hubot/jenkins-notify?room=%23halkeye&always_notify=1")
+      .send(JSON.stringify(finished_failed_body))
+      .expect(200)
+      .end(endfunc)
+  it 'Robot sent out respond', ()->
+    robot.adapter.send.called.should.be.true
+  it 'Robot sent to right room', ()->
+    robot.adapter.send.getCall(0).args[0].should.eql { user: { room: '#halkeye' }, room: '#halkeye' }
+  it 'Robot sent right message', ()->
+    robot.adapter.send.getCall(0).args[1].should.eql "We got fail: JobName build #1 started failing (http://ci.jenkins.org/job/project/5)"
 
