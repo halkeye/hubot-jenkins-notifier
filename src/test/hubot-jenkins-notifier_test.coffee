@@ -8,7 +8,7 @@ sinon = require('sinon')
 adapterPath = Path.join Path.dirname(require.resolve 'hubot'), "src", "adapters"
 robot = Hubot.loadBot adapterPath, "shell", "true", "MochaHubot"
 
-hubot_jenkins_notifier = require('../scripts/hubot-jenkins-notifier.js')(robot)
+hubot_jenkins_notifier = require('../scripts/hubot-jenkins-notifier')(robot)
 
 ###
 ======== A Handy Little Mocha Reference ========
@@ -88,7 +88,9 @@ describe 'finished-failed', ()->
   it 'Robot sent out respond', ()->
     robot.adapter.send.called.should.be.true
   it 'Robot sent to right room', ()->
-    robot.adapter.send.getCall(0).args[0].should.eql { user: { room: '#halkeye' }, room: '#halkeye' }
+    send_arg = robot.adapter.send.getCall(0).args[0]
+    send_arg.user.room.should.eql '#halkeye'
+    send_arg.room.should.eql '#halkeye'
   it 'Robot sent right message', ()->
-    robot.adapter.send.getCall(0).args[1].should.eql "We got fail: JobName build #1 started failing (http://ci.jenkins.org/job/project/5)"
+    robot.adapter.send.getCall(0).args[1].should.eql "JobName build #1 started failing (http://ci.jenkins.org/job/project/5)"
 
