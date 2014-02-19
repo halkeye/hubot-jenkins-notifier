@@ -34,6 +34,7 @@
 
 url = require('url')
 querystring = require('querystring')
+util = require('util')
 
 
 class JenkinsNotifier
@@ -41,9 +42,12 @@ class JenkinsNotifier
     @robot = robot
     @failing = []
 
-  error: (e) ->
-    console.log "jenkins-notify error: #{error}. Data: #{req.body}"
-    console.log error.stack
+  reset: () ->
+    @failing = []
+
+  error: (err, body) ->
+    console.log "jenkins-notify error: #{err.message}. Data: #{util.inspect(body)}"
+    console.log err.stack
 
   shouldNotify: (notstrat, data) ->
     if data.build.status == 'FAILURE'
@@ -81,13 +85,22 @@ class JenkinsNotifier
     try
       # Newer versions of express/hubot already process posts that have Content-Type application/json
       for key of req.body
+        # breaks in 0.11
+        if key == '__proto__'
+          continue
         data = JSON.parse key
-    catch error
+        break
+    catch err
+      @error err, req.body
       try
         data = req.body
       catch error
-        @error error
+        @error err, req.body
         return
+
+    if typeof data.build != 'object'
+      @error new Error("Unable to process data"), req.body
+      return
 
     if data.build.phase == 'FINISHED'
       if data.build.status == 'FAILURE'
@@ -107,8 +120,8 @@ class JenkinsNotifier
         @failing.splice index, 1 if index isnt -1
 
 module.exports = (robot) ->
-  notifier = new JenkinsNotifier robot
+  robot.jenkins_notifier = new JenkinsNotifier robot
 
   robot.router.post "/hubot/jenkins-notify", (req, res) ->
-    notifier.process req, res
+    robot.jenkins_notifier.process req, res
 
