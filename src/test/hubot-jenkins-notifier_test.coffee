@@ -60,37 +60,75 @@ Should assertions:
   user.should.be.a('object').and.have.property('name', 'tj')
 ###
 
-
-finished_failed_body = {
-  "name":"JobName",
-  "url":"JobUrl",
-  "build":{
-    "number":1,
-    "phase":"FINISHED",
-    "status":"FAILURE",
-    "url":"job/project/5",
-    "full_url":"http://ci.jenkins.org/job/project/5"
-    "parameters":{"branch":"master"}
+test_data = [
+  {
+    "name": "finished-failed",
+    "expected_out": "JobName build #1 started failing (http://ci.jenkins.org/job/project/5)",
+    "body": {
+      "name":"JobName",
+      "url":"JobUrl",
+      "build":{
+        "number":1,
+        "phase":"FINISHED",
+        "status":"FAILURE",
+        "url":"job/project/5",
+        "full_url":"http://ci.jenkins.org/job/project/5"
+        "parameters":{"branch":"master"}
+      }
+    }
+  },
+  {
+    "name": "started-failed",
+    "expected_out": false,
+    "body": {
+      "name":"JobName",
+      "url":"JobUrl",
+      "build":{
+        "number":2,
+        "phase":"STARTED",
+        "status":"FAILED",
+        "url":"job/project/5",
+        "full_url":"http://ci.jenkins.org/job/project/5"
+        "parameters":{"branch":"master"}
+      }
+    }
   }
+]
+
+urls = {
+  'new' : "/hubot/jenkins-notify?room=%23halkeye&always_notify=1",
+  'old' : "/hubot/jenkins-notify?room=%23halkeye&notstrat=FS"
 }
 
-describe 'finished-failed', ()->
-  before (done) ->
-    robot.adapter.send = sinon.spy()
-    endfunc = (err, res) ->
-      throw err if err
-      do done
-    request(robot.router)
-      .post("/hubot/jenkins-notify?room=%23halkeye&always_notify=1")
-      .send(JSON.stringify(finished_failed_body))
-      .expect(200)
-      .end(endfunc)
-  it 'Robot sent out respond', ()->
-    robot.adapter.send.called.should.be.true
-  it 'Robot sent to right room', ()->
-    send_arg = robot.adapter.send.getCall(0).args[0]
-    send_arg.user.room.should.eql '#halkeye'
-    send_arg.room.should.eql '#halkeye'
-  it 'Robot sent right message', ()->
-    robot.adapter.send.getCall(0).args[1].should.eql "JobName build #1 started failing (http://ci.jenkins.org/job/project/5)"
+for test in test_data then do (test) ->
+  for url_type,url of urls then do (url_type, url) ->
+    describe test.name + '-' + url_type, ()->
+      before (done) ->
+        robot.jenkins_notifier.reset()
+        robot.adapter.send = sinon.spy()
+        endfunc = (err, res) ->
+          throw err if err
+          do done
+        request(robot.router)
+          .post(url)
+          .send(JSON.stringify(test.body))
+          .expect(200)
+          .end(endfunc)
+      it 'Robot sent out respond', ()->
+        if test.expected_out == false
+          robot.adapter.send.called.should.be.false
+        else
+          robot.adapter.send.called.should.be.true
+      it 'Robot sent to right room', ()->
+        if test.expected_out == false
+          # previous test will test this
+        else
+          send_arg = robot.adapter.send.getCall(0).args[0]
+          send_arg.user.room.should.eql '#halkeye'
+          send_arg.room.should.eql '#halkeye'
+      it 'Robot sent right message', ()->
+        if test.expected_out == false
+          # previous test will test this
+        else
+          robot.adapter.send.getCall(0).args[1].should.eql test.expected_out
 
