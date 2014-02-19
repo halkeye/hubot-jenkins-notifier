@@ -1,5 +1,7 @@
 # hubot-jenkins-notifier
 
+[![Build Status](https://travis-ci.org/halkeye/hubot-jenkins-notifier.png?branch=master)](https://travis-ci.org/halkeye/hubot-jenkins-notifier)
+
 Notifies about Jenkins build errors via [Jenkins Notification Plugin](https://wiki.jenkins-ci.org/display/JENKINS/Notification+Plugin)
 
 ## Getting Started
@@ -10,6 +12,9 @@ Notifies about Jenkins build errors via [Jenkins Notification Plugin](https://wi
 _(Coming soon)_
 
 ## Release History
+
+0.1.4 - 2014-02-18
+* Brought in recent changes from [github/hubot-scripts](http://www.github.com/github/hubot-scripts)
 
 0.1.3 - 2013-08-05
 * support hubot-irc adapter
