@@ -101,6 +101,7 @@ class JenkinsNotifier
     if typeof data.build != 'object'
       @error new Error("Unable to process data"), req.body
       return
+    fullurl = encodeURI(data.build.full_url || data.build.url)
 
     if data.build.phase == 'FINISHED'
       if data.build.status == 'FAILURE'
@@ -108,14 +109,14 @@ class JenkinsNotifier
           build = "is still"
         else
           build = "started"
-        @robot.send envelope, "#{data.name} build ##{data.build.number} #{build} failing (#{encodeURI(data.build.full_url)})" if @shouldNotify(envelope.notstrat, data)
+        @robot.send envelope, "#{data.name} build ##{data.build.number} #{build} failing (#{fullurl})" if @shouldNotify(envelope.notstrat, data)
         @failing.push data.name unless data.name in @failing
       if data.build.status == 'SUCCESS'
         if data.name in @failing
           build = "was restored"
         else
           build = "succeeded"
-        @robot.send envelope, "#{data.name} build ##{data.build.number} #{build} (#{encodeURI(data.build.full_url)})"  if @shouldNotify(envelope.notstrat, data)
+        @robot.send envelope, "#{data.name} build ##{data.build.number} #{build} (#{fullurl})"  if @shouldNotify(envelope.notstrat, data)
         index = @failing.indexOf data.name
         @failing.splice index, 1 if index isnt -1
 
