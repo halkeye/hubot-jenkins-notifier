@@ -2,6 +2,7 @@
 
 .travis*
 History.md
+Gruntfile.coffee
 grunt.coffee
 grunt.js
 
