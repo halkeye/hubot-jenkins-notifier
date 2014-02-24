@@ -78,6 +78,21 @@ test_data = [
     }
   },
   {
+    "name": "finished-failed-nofull_url",
+    "expected_out": "JobName build #1 started failing (job/project/5)",
+    "body": {
+      "name":"JobName",
+      "url":"JobUrl",
+      "build":{
+        "number":1,
+        "phase":"FINISHED",
+        "status":"FAILURE",
+        "url":"job/project/5",
+        "parameters":{"branch":"master"}
+      }
+    }
+  },
+  {
     "name": "started-failed",
     "expected_out": false,
     "body": {
