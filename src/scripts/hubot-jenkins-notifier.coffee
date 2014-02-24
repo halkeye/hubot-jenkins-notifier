@@ -70,6 +70,26 @@ class JenkinsNotifier
       return false
     console.log "this should not happen"
 
+  dataMethodJSONParse: (req,data) ->
+    return false if typeof req.body != 'object'
+
+    # Remove __proto__ key from keys (newer node)
+    ret = Object.keys(req.body).filter (val) ->
+      val != '__proto__'
+
+    # if there is only one key remaining then process taht
+    try
+      if ret.length == 1
+        return JSON.parse ret[0]
+    catch err
+      return false
+
+    return false
+
+  dataMethodRaw: (req) ->
+    return false if typeof req.body != 'object'
+    return req.body
+
   process: (req,res) ->
     query = querystring.parse(url.parse(req.url).query)
 
@@ -82,23 +102,19 @@ class JenkinsNotifier
     envelope.notstrat = 'FS' if query.always_notify #legacy
     envelope.user.type = query.type if query.type
 
-    try
-      # Newer versions of express/hubot already process posts that have Content-Type application/json
-      for key of req.body
-        # breaks in 0.11
-        if key == '__proto__'
-          continue
-        data = JSON.parse key
-        break
-    catch err
-      @error err, req.body
-      try
-        data = req.body
-      catch error
-        @error err, req.body
-        return
+    data = null
 
-    if typeof data.build != 'object'
+    filterChecker = (item, callback) ->
+      return if data
+
+      ret = item(req)
+      if (ret && ret.build)
+        data = ret
+        return true
+
+    [@dataMethodJSONParse, @dataMethodRaw].forEach(filterChecker)
+
+    if !data || typeof data.build != 'object'
       @error new Error("Unable to process data"), req.body
       return
     fullurl = encodeURI(data.build.full_url || data.build.url)
