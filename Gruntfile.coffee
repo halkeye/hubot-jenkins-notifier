@@ -26,7 +26,7 @@ module.exports = (grunt)->
     simplemocha:
       all:
         src: [
-          'node_modules/should/lib/should.js'
+          'node_modules/should/should.js'
           'src/test/**/*.coffee'
         ]
         options:
