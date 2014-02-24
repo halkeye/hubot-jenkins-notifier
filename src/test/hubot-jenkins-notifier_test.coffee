@@ -1,12 +1,12 @@
 'use strict'
-
+process.env.PORT = 0 # pick a random port for this test
 Hubot = require('hubot')
 Path = require('path')
 request = require('supertest')
 sinon = require('sinon')
 
 adapterPath = Path.join Path.dirname(require.resolve 'hubot'), "src", "adapters"
-robot = Hubot.loadBot adapterPath, "shell", "true", "MochaHubot"
+robot = Hubot.loadBot adapterPath, "shell", true, "MochaHubot"
 
 hubot_jenkins_notifier = require('../scripts/hubot-jenkins-notifier')(robot)
 
