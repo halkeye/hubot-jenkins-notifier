@@ -63,7 +63,7 @@ Should assertions:
 test_data = [
   {
     "name": "finished-failed",
-    "expected_out": "JobName build #1 started failing (http://ci.jenkins.org/job/project/5)",
+    "expected_out": "JobName build #1 started failing: http://ci.jenkins.org/job/project/5",
     "body": {
       "name":"JobName",
       "url":"JobUrl",
@@ -79,7 +79,7 @@ test_data = [
   },
   {
     "name": "finished-failed-nofull_url",
-    "expected_out": "JobName build #1 started failing (job/project/5)",
+    "expected_out": "JobName build #1 started failing: job/project/5",
     "body": {
       "name":"JobName",
       "url":"JobUrl",

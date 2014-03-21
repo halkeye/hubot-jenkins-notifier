@@ -14,7 +14,7 @@
 #   None
 #
 # URLS:
-#   POST /hubot/jenkins-notify?room=<room>[&type=<type>][&notstrat=<notificationSTrategy>]
+#   POST /hubot/jenkins-notify?room=<room>[&type=<type>][&notstrat=<notificationStrategy>]
 #
 # Notes:
 #   Copyright (c) 2013 Gavin Mogan
@@ -77,7 +77,7 @@ class JenkinsNotifier
     ret = Object.keys(req.body).filter (val) ->
       val != '__proto__'
 
-    # if there is only one key remaining then process taht
+    # if there is only one key remaining then process that
     try
       if ret.length == 1
         return JSON.parse ret[0]
@@ -117,7 +117,7 @@ class JenkinsNotifier
     if !data || typeof data.build != 'object'
       @error new Error("Unable to process data"), req.body
       return
-    fullurl = encodeURI(data.build.full_url || data.build.url)
+    fullurl = data.build.full_url || data.build.url
 
     if data.build.phase == 'FINISHED'
       if data.build.status == 'FAILURE'
@@ -125,14 +125,14 @@ class JenkinsNotifier
           build = "is still"
         else
           build = "started"
-        @robot.send envelope, "#{data.name} build ##{data.build.number} #{build} failing (#{fullurl})" if @shouldNotify(envelope.notstrat, data)
+        @robot.send envelope, "#{data.name} build ##{data.build.number} #{build} failing: #{fullurl}" if @shouldNotify(envelope.notstrat, data)
         @failing.push data.name unless data.name in @failing
       if data.build.status == 'SUCCESS'
         if data.name in @failing
           build = "was restored"
         else
           build = "succeeded"
-        @robot.send envelope, "#{data.name} build ##{data.build.number} #{build} (#{fullurl})"  if @shouldNotify(envelope.notstrat, data)
+        @robot.send envelope, "#{data.name} build ##{data.build.number} #{build}: #{fullurl}"  if @shouldNotify(envelope.notstrat, data)
         index = @failing.indexOf data.name
         @failing.splice index, 1 if index isnt -1
 
