@@ -63,7 +63,7 @@ Should assertions:
 test_data = [
   {
     "name": "finished-failed",
-    "expected_out": "JobName build #1 started failing (http://ci.jenkins.org/job/project/5)",
+    "expected_out": "JobName build #1 started failing: http://ci.jenkins.org/job/project name/5",
     "body": {
       "name":"JobName",
       "url":"JobUrl",
@@ -71,15 +71,15 @@ test_data = [
         "number":1,
         "phase":"FINISHED",
         "status":"FAILURE",
-        "url":"job/project/5",
-        "full_url":"http://ci.jenkins.org/job/project/5"
+        "url":"job/project%20name/5",
+        "full_url":"http://ci.jenkins.org/job/project%20name/5"
         "parameters":{"branch":"master"}
       }
     }
   },
   {
     "name": "finished-failed-nofull_url",
-    "expected_out": "JobName build #1 started failing (job/project/5)",
+    "expected_out": "JobName build #1 started failing: job/project name/5",
     "body": {
       "name":"JobName",
       "url":"JobUrl",
@@ -87,7 +87,7 @@ test_data = [
         "number":1,
         "phase":"FINISHED",
         "status":"FAILURE",
-        "url":"job/project/5",
+        "url":"job/project%20name/5",
         "parameters":{"branch":"master"}
       }
     }
@@ -102,8 +102,8 @@ test_data = [
         "number":2,
         "phase":"STARTED",
         "status":"FAILED",
-        "url":"job/project/5",
-        "full_url":"http://ci.jenkins.org/job/project/5"
+        "url":"job/project%20name/5",
+        "full_url":"http://ci.jenkins.org/job/project%20name/5"
         "parameters":{"branch":"master"}
       }
     }
