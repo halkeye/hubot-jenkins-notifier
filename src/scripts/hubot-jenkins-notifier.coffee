@@ -42,7 +42,7 @@ class JenkinsNotifier
     @robot = robot
     @failing = []
 
-  reset: () ->
+  reset: ->
     @failing = []
 
   error: (err, body) ->
@@ -119,7 +119,7 @@ class JenkinsNotifier
       return
     fullurl = data.build.full_url || data.build.url
 
-    if data.build.phase == 'FINISHED'
+    if data.build.phase in ['FINISHED', 'FINALIZED']
       if data.build.status == 'FAILURE'
         if data.name in @failing
           build = "is still"
