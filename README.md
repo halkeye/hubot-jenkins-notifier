@@ -21,6 +21,11 @@ _(Coming soon)_
 
 ## Release History
 
+0.1.5 - 2014-09-18
+
+* Tweak configs to work with newer versions of npm / fix for travis-ci
+* Support jenkins 1.577 (Now passes FINALIZED instead of FINISHED) - [Jenkins Notifier Commit](https://github.com/jenkinsci/notification-plugin/commit/2af09e3002ff887a5eaa7577b190f1cbb9c123e3)
+
 0.1.4 - 2014-02-23
 
 * Brought in recent changes from [github/hubot-scripts](http://www.github.com/github/hubot-scripts)
