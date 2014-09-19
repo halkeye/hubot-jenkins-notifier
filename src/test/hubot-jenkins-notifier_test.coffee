@@ -107,6 +107,22 @@ test_data = [
         "parameters":{"branch":"master"}
       }
     }
+  },
+  {
+    "name": "started-finalized",
+    "expected_out": false,
+    "body": {
+      "name":"JobName",
+      "url":"JobUrl",
+      "build":{
+        "number":2,
+        "phase":"STARTED",
+        "status":"FINALIZED",
+        "url":"job/project%20name/5",
+        "full_url":"http://ci.jenkins.org/job/project%20name/5"
+        "parameters":{"branch":"master"}
+      }
+    }
   }
 ]
 
