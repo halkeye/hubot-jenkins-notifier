@@ -6,4 +6,6 @@ Gruntfile.coffee
 grunt.coffee
 grunt.js
 
+src/test
+
 out/
