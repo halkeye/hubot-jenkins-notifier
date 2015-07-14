@@ -43,7 +43,7 @@
     "grunt-contrib-jshint": "~0.8.0"
   },
   "keywords": [
-    "hubot"
+    "hubot", "hubot-scripts", "jenkins"
   ],
   "dependencies": {}
 }
