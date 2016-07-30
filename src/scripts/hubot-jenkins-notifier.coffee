@@ -6,15 +6,19 @@
 #
 # Configuration:
 #   Make jenkins hit <HUBOT_URL>:<PORT>/hubot/jenkins-notify?room=<room>
+#   or <HUBOT_URL>:<PORT>/hubot/jenkins-notify?user=<user>
 #   Notification config. See here: https://wiki.jenkins-ci.org/display/JENKINS/Notification+Plugin
 #   Optional Params:
-#     always_notify=1
+#     always_notify: always notify even on success
+#     notstrat: Notification strategy, please see below
+#     always_notify: always notify even on success
+#     trace: trace the received JSON object
 #
 # Commands:
 #   None
 #
 # URLS:
-#   POST /hubot/jenkins-notify?room=<room>[&type=<type>][&notstrat=<notificationStrategy>]
+#   POST /hubot/jenkins-notify?room=<room>|user=<user>[&type=<type>][&notstrat=<notificationStrategy>][&always_notify=1][&trace=1]
 #
 # Notes:
 #   Copyright (c) 2013 Gavin Mogan
@@ -41,6 +45,7 @@ class JenkinsNotifier
   constructor: (robot) ->
     @robot = robot
     @failing = []
+    console.log "Jenkins Notifier Hubot script started. Awaiting requests."
 
   reset: ->
     @failing = []
@@ -91,16 +96,30 @@ class JenkinsNotifier
     return req.body
 
   process: (req,res) ->
+    console.log "jenkins-notifier: Incoming request at #{req.url}"
+
     query = querystring.parse(url.parse(req.url).query)
 
     res.end('')
 
     envelope = {notstrat:"Fs"}
     envelope.user = {}
-    envelope.user.room = envelope.room = query.room if query.room
+    
     envelope.notstrat = query.notstrat if query.notstrat
     envelope.notstrat = 'FS' if query.always_notify #legacy
     envelope.user.type = query.type if query.type
+
+    if query.user && query.room
+      console.log "Cannot use room and user together"
+      return
+
+    if query.user
+      console.log "sending to user #{query.user}"
+      envelope.user.user = query.user
+
+    if query.room
+      console.log "sending to room #{query.room}"
+      envelope.user.room = envelope.room = query.room if query.room
 
     data = null
 
@@ -117,22 +136,46 @@ class JenkinsNotifier
     if !data || typeof data.build != 'object'
       @error new Error("Unable to process data"), req.body
       return
+
+    if query.trace
+      console.log data.build
+
     fullurl = data.build.full_url || data.build.url
 
-    if data.build.phase in ['FINISHED', 'FINALIZED']
+    if data.build.phase in ['COMPLETED']
+      console.log "Ignoring phase COMPLETED"
+      return
+
+    if data.build.phase in ['STARTED']
+      @robot.send envelope, "#{data.name} build ##{data.build.number} started: #{fullurl}"
+    else
+      console.log "#{data.name} #{data.build.phase} #{data.build.status}"
+      
       if data.build.status == 'FAILURE'
         if data.name in @failing
           build = "is still"
         else
           build = "started"
-        @robot.send envelope, "#{data.name} build ##{data.build.number} #{build} failing: #{fullurl}" if @shouldNotify(envelope.notstrat, data)
+
+        if @shouldNotify(envelope.notstrat, data)
+            message = "#{data.name} build ##{data.build.number} #{build} failing: #{fullurl}"
+            if data.build.log? && data.build.log.length != 0
+              message = message + "\r\n" + data.build.log
+            @robot.send envelope, message
+        else
+            console.log "Not sending message, not necessary"
         @failing.push data.name unless data.name in @failing
       if data.build.status == 'SUCCESS'
         if data.name in @failing
           build = "was restored"
         else
           build = "succeeded"
-        @robot.send envelope, "#{data.name} build ##{data.build.number} #{build}: #{fullurl}"  if @shouldNotify(envelope.notstrat, data)
+
+        if @shouldNotify(envelope.notstrat, data)
+            @robot.send envelope, "#{data.name} build ##{data.build.number} #{build}: #{fullurl}"
+        else
+            console.log "Not sending message, not necessary"
+
         index = @failing.indexOf data.name
         @failing.splice index, 1 if index isnt -1
 

@@ -8,8 +8,11 @@ Notifies about Jenkins build errors via [Jenkins Notification Plugin](https://wi
 ## Getting Started
 1. Install the module: `npm install --save hubot-jenkins-notifier`
 2. Add it `hubot-jenkins-notifier` to your external-scripts.json file in your hubot directory
-3. Add hubot's endpoint to jenkins jobs `http://<hubot-host>:<hubot-port>/hubot/jenkins-notify?room=<room>` (see Screenshot)
-
+3. Add hubot's endpoint to jenkins jobs: (see Screenshot)
+ 1. Configure it to be JSON, HTTP and either "All events", "Job started" or "Job finalized". "Job completed" will be ignored.
+ 2. To send to a room: `http://<hubot-host>:<hubot-port>/hubot/jenkins-notify?room=<room>` 
+ 3. To send to a user: `http://<hubot-host>:<hubot-port>/hubot/jenkins-notify?user=<username>` 
+ 4. Add log lines if you want to
 
 ### Screenshot
 ![Jenkins Notifier Plugin Config Screenshot](jenkins-notifier-screenshot.png)
@@ -17,9 +20,22 @@ Notifies about Jenkins build errors via [Jenkins Notification Plugin](https://wi
 
 
 ## Configuration
-_(Coming soon)_
+As url parameters the following can be used:
+
+* `room`: The room name to send the message to. Mutually exlusive with `user`
+* `user`: The user name to send the private message to. Mutually exlusive with `room`
+* `always_notify`: always notify even on success
+* `notstrat`: Notification strategy: [Ff][Ss] which stands for "Failure" and "Success". Capitalized letter means: notify always. Small letter means: notify only if buildstatus has changed
+  "Fs" is the default
+* `trace`: trace the received JSON object
 
 ## Release History
+
+0.2.0 - 2016-07-30
+
+* Added parameter `user`, `trace`
+* Updated documentation to reflect changes in jenkins notification plugin
+* Added traces and logs
 
 0.1.5 - 2014-09-18
 

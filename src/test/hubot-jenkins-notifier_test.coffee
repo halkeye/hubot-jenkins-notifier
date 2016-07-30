@@ -94,7 +94,7 @@ test_data = [
   },
   {
     "name": "started-failed",
-    "expected_out": false,
+    "expected_out": "JobName build #2 started: http://ci.jenkins.org/job/project name/5",
     "body": {
       "name":"JobName",
       "url":"JobUrl",
@@ -110,7 +110,7 @@ test_data = [
   },
   {
     "name": "started-finalized",
-    "expected_out": false,
+    "expected_out": "JobName build #2 started: http://ci.jenkins.org/job/project name/5",
     "body": {
       "name":"JobName",
       "url":"JobUrl",
