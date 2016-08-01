@@ -45,7 +45,7 @@ class JenkinsNotifier
   constructor: (robot) ->
     @robot = robot
     @failing = []
-    console.log "Jenkins Notifier Hubot script started. Awaiting requests."
+    @logMessage(undefined, "Jenkins Notifier Hubot script started. Awaiting requests.")
 
   reset: ->
     @failing = []
@@ -53,6 +53,10 @@ class JenkinsNotifier
   error: (err, body) ->
     console.log "jenkins-notify error: #{err.message}. Data: #{util.inspect(body)}"
     console.log err.stack
+
+  logMessage: (traceQueryParam, message) ->
+    if (traceQueryParam? && traceQueryParam) || (process.env.JENKINS_NOTIFIER_TRACE && process.env.JENKINS_NOTIFIER_TRACE)
+      console.log message
 
   shouldNotify: (notstrat, data) ->
     if data.build.status == 'FAILURE'
@@ -96,7 +100,7 @@ class JenkinsNotifier
     return req.body
 
   process: (req,res) ->
-    console.log "jenkins-notifier: Incoming request at #{req.url}"
+    @logMessage(undefined, "jenkins-notifier: Incoming request at #{req.url}")
 
     query = querystring.parse(url.parse(req.url).query)
 
@@ -110,16 +114,16 @@ class JenkinsNotifier
     envelope.user.type = query.type if query.type
 
     if query.user && query.room
-      console.log "Cannot use room and user together"
+      @logMessage(query.trace, "Cannot use room and user together")
       return
 
     if query.user
-      console.log "sending to user #{query.user}"
+      @logMessage(query.trace, "sending to user #{query.user}")
       envelope.user.user = query.user
 
     if query.room
-      console.log "sending to room #{query.room}"
-      envelope.user.room = envelope.room = query.room if query.room
+      @logMessage(query.trace, "sending to room #{query.room}")
+      envelope.user.room = envelope.room = query.room
 
     data = null
 
@@ -137,19 +141,22 @@ class JenkinsNotifier
       @error new Error("Unable to process data"), req.body
       return
 
-    if query.trace
-      console.log data.build
+    @logMessage(query.trace, data.build)
 
     fullurl = data.build.full_url || data.build.url
 
     if data.build.phase in ['COMPLETED']
-      console.log "Ignoring phase COMPLETED"
+      @logMessage(query.trace, "Ignoring phase COMPLETED")
       return
 
     if data.build.phase in ['STARTED']
+      @logMessage(query.trace, "#{data.name} #{data.build.phase} #{data.build.status}")
+
       @robot.send envelope, "#{data.name} build ##{data.build.number} started: #{fullurl}"
-    else
-      console.log "#{data.name} #{data.build.phase} #{data.build.status}"
+      return
+
+    if data.build.phase in ['FINISHED', 'FINALIZED']
+      @logMessage(query.trace, "#{data.name} #{data.build.phase} #{data.build.status}")
       
       if data.build.status == 'FAILURE'
         if data.name in @failing
@@ -159,11 +166,12 @@ class JenkinsNotifier
 
         if @shouldNotify(envelope.notstrat, data)
             message = "#{data.name} build ##{data.build.number} #{build} failing: #{fullurl}"
+
             if data.build.log? && data.build.log.length != 0
               message = message + "\r\n" + data.build.log
             @robot.send envelope, message
         else
-            console.log "Not sending message, not necessary"
+          @logMessage(query.trace, "Not sending message, not necessary")
         @failing.push data.name unless data.name in @failing
       if data.build.status == 'SUCCESS'
         if data.name in @failing
@@ -174,7 +182,7 @@ class JenkinsNotifier
         if @shouldNotify(envelope.notstrat, data)
             @robot.send envelope, "#{data.name} build ##{data.build.number} #{build}: #{fullurl}"
         else
-            console.log "Not sending message, not necessary"
+          @logMessage(query.trace, "Not sending message, not necessary")
 
         index = @failing.indexOf data.name
         @failing.splice index, 1 if index isnt -1

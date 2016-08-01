@@ -17,8 +17,6 @@ Notifies about Jenkins build errors via [Jenkins Notification Plugin](https://wi
 ### Screenshot
 ![Jenkins Notifier Plugin Config Screenshot](jenkins-notifier-screenshot.png)
 
-
-
 ## Configuration
 As url parameters the following can be used:
 
@@ -27,7 +25,11 @@ As url parameters the following can be used:
 * `always_notify`: always notify even on success
 * `notstrat`: Notification strategy: [Ff][Ss] which stands for "Failure" and "Success". Capitalized letter means: notify always. Small letter means: notify only if buildstatus has changed
   "Fs" is the default
-* `trace`: trace the received JSON object
+* `trace`: enable tracing for diagnostics
+
+Environment variable:
+
+* JENKINS_NOTIFIER_TRACE: set this environment variable to 1 to enable tracing for diagnostics
 
 ## Release History
 
