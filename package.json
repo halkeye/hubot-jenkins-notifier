@@ -5,8 +5,8 @@
   "homepage": "https://github.com/halkeye/hubot-jenkins-notifier",
   "author": {
     "name": "Gavin Mogan",
-    "email": "gavin@kodekoan.com",
-    "url": "http://www.kodekoan.com"
+    "email": "gavin@gavinmogan.com",
+    "url": "http://www.gavinmogan.com"
   },
   "repository": {
     "type": "git",
@@ -37,10 +37,7 @@
     "grunt": "~0.4.2",
     "supertest": "~0.9.0",
     "sinon": "~1.8.2",
-    "hubot": "~2.7.1",
-    "grunt-contrib-copy": "~0.5.0",
-    "grunt-contrib-coffee": "~0.10.1",
-    "grunt-contrib-jshint": "~0.8.0"
+    "hubot": "~2.7.1"
   },
   "keywords": [
     "hubot", "hubot-scripts", "jenkins"
