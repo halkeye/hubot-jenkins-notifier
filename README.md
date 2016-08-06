@@ -53,6 +53,3 @@ _(Coming soon)_
 Copyright (c) 2013 Gavin Mogan
 Licensed under the MIT license.
 
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/halkeye/hubot-jenkins-notifier/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
