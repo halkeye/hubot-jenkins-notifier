@@ -145,6 +145,7 @@ for test in test_data then do (test) ->
           .send(JSON.stringify(test.body))
           .expect(200)
           .end(endfunc)
+        return
       it 'Robot sent out respond', ()->
         if test.expected_out == false
           robot.adapter.send.called.should.be.false
