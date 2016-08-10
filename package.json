@@ -33,7 +33,7 @@
     "grunt-contrib-clean": "~1.0.0",
     "grunt-coffeelint": "0.0.16",
     "grunt-simple-mocha": "~0.4.0",
-    "should": "~10.0.0",
+    "should": "~11.0.0",
     "grunt": "~1.0.1",
     "supertest": "~2.0.0",
     "sinon": "~1.17.5",
