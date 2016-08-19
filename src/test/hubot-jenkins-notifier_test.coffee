@@ -163,3 +163,56 @@ for test in test_data then do (test) ->
         else
           robot.adapter.send.getCall(0).args[1].should.eql test.expected_out
 
+badUrls = [
+  {
+    name: "",
+    url: "/hubot/jenkins-notify?room=%23halkeye&user=someusername",
+    expectedResponse: "",
+    expectedResponseCode: 400,
+    body: {
+      "name":"JobName",
+      "url":"JobUrl",
+      "build":{
+        "number":1,
+        "phase":"FINISHED",
+        "status":"FAILURE",
+        "url":"job/project%20name/5",
+        "full_url":"http://ci.jenkins.org/job/project%20name/5"
+        "parameters":{"branch":"master"}
+      }
+    }
+  }, {
+    name: "",
+    url: "/hubot/jenkins-notify",
+    expectedResponse: "",
+    expectedResponseCode: 400,
+    body: {
+      "name":"JobName",
+      "url":"JobUrl",
+      "build":{
+        "number":1,
+        "phase":"FINISHED",
+        "status":"FAILURE",
+        "url":"job/project%20name/5",
+        "full_url":"http://ci.jenkins.org/job/project%20name/5"
+        "parameters":{"branch":"master"}
+      }
+    }
+  }
+]
+
+for badUrl in badUrls then do (badUrl) ->
+  describe badUrl.name + ': ' + badUrl.url, ()->
+    before (done) ->
+      robot.jenkins_notifier.reset()
+      robot.adapter.send = sinon.spy()
+      endfunc = (err, res) ->
+        throw err if err
+        do done
+      request(robot.router)
+      .post(badUrl.url)
+      .send(JSON.stringify(badUrl.body))
+      .expect(badUrl.expectedResponseCode)
+      .end(endfunc)
+    it 'Robot sent out correct response code', ()->
+      robot.adapter.send.called.should.be.false

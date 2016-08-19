@@ -99,12 +99,10 @@ class JenkinsNotifier
     return false if typeof req.body != 'object'
     return req.body
 
-  process: (req,res) ->
+  process: (req, res) ->
     @logMessage(undefined, "jenkins-notifier: Incoming request at #{req.url}")
 
     query = querystring.parse(url.parse(req.url).query)
-
-    res.end('')
 
     envelope = {notstrat:"Fs"}
     envelope.user = {}
@@ -114,8 +112,16 @@ class JenkinsNotifier
     envelope.user.type = query.type if query.type
 
     if query.user && query.room
-      @logMessage(query.trace, "Cannot use room and user together")
+      console.log "Cannot use room (#{query.room}) and user together (#{query.user})"
+      res.status(400).end()
       return
+
+    if !query.user && !query.room
+      console.log "Must use room or user parameter"
+      res.status(400).end()
+      return
+
+    res.end('')
 
     if query.user
       @logMessage(query.trace, "sending to user #{query.user}")
@@ -138,7 +144,7 @@ class JenkinsNotifier
     [@dataMethodJSONParse, @dataMethodRaw].forEach(filterChecker)
 
     if !data || typeof data.build != 'object'
-      @error new Error("Unable to process data"), req.body
+      @error new Error("Unable to process data - data empty or not an object"), req.body
       return
 
     @logMessage(query.trace, data.build)
@@ -149,15 +155,13 @@ class JenkinsNotifier
       @logMessage(query.trace, "Ignoring phase COMPLETED")
       return
 
-    if data.build.phase in ['STARTED']
-      @logMessage(query.trace, "#{data.name} #{data.build.phase} #{data.build.status}")
+    @logMessage(query.trace, "#{data.name} #{data.build.phase} #{data.build.status}")
 
+    if data.build.phase in ['STARTED']
       @robot.send envelope, "#{data.name} build ##{data.build.number} started: #{fullurl}"
       return
 
     if data.build.phase in ['FINISHED', 'FINALIZED']
-      @logMessage(query.trace, "#{data.name} #{data.build.phase} #{data.build.status}")
-      
       if data.build.status == 'FAILURE'
         if data.name in @failing
           build = "is still"
@@ -173,6 +177,7 @@ class JenkinsNotifier
         else
           @logMessage(query.trace, "Not sending message, not necessary")
         @failing.push data.name unless data.name in @failing
+
       if data.build.status == 'SUCCESS'
         if data.name in @failing
           build = "was restored"
