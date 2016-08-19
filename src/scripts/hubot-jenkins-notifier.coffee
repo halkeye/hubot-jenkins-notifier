@@ -169,11 +169,11 @@ class JenkinsNotifier
           build = "started"
 
         if @shouldNotify(envelope.notstrat, data)
-            message = "#{data.name} build ##{data.build.number} #{build} failing: #{fullurl}"
+          message = "#{data.name} build ##{data.build.number} #{build} failing: #{fullurl}"
 
-            if data.build.log? && data.build.log.length != 0
-              message = message + "\r\n" + data.build.log
-            @robot.send envelope, message
+          if data.build.log? && data.build.log.length != 0
+            message = message + "\r\n" + data.build.log
+          @robot.send envelope, message
         else
           @logMessage(query.trace, "Not sending message, not necessary")
         @failing.push data.name unless data.name in @failing
@@ -185,7 +185,7 @@ class JenkinsNotifier
           build = "succeeded"
 
         if @shouldNotify(envelope.notstrat, data)
-            @robot.send envelope, "#{data.name} build ##{data.build.number} #{build}: #{fullurl}"
+          @robot.send envelope, "#{data.name} build ##{data.build.number} #{build}: #{fullurl}"
         else
           @logMessage(query.trace, "Not sending message, not necessary")
 
