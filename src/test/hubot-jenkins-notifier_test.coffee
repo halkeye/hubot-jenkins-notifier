@@ -215,4 +215,4 @@ for badUrl in badUrls then do (badUrl) ->
         .expect(badUrl.expectedResponseCode)
         .end(endfunc)
     it 'Robot sent out correct response code', ()->
-
+      robot.adapter.send.called.should.be.false
