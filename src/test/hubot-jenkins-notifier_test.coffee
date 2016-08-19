@@ -210,9 +210,9 @@ for badUrl in badUrls then do (badUrl) ->
         throw err if err
         do done
       request(robot.router)
-      .post(badUrl.url)
-      .send(JSON.stringify(badUrl.body))
-      .expect(badUrl.expectedResponseCode)
-      .end(endfunc)
+        .post(badUrl.url)
+        .send(JSON.stringify(badUrl.body))
+        .expect(badUrl.expectedResponseCode)
+        .end(endfunc)
     it 'Robot sent out correct response code', ()->
-      robot.adapter.send.called.should.be.false
+
