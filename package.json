@@ -5,8 +5,8 @@
   "homepage": "https://github.com/halkeye/hubot-jenkins-notifier",
   "author": {
     "name": "Gavin Mogan",
-    "email": "gavin@kodekoan.com",
-    "url": "http://www.kodekoan.com"
+    "email": "gavin@gavinmogan.com",
+    "url": "http://www.gavinmogan.com"
   },
   "repository": {
     "type": "git",
@@ -29,21 +29,20 @@
     "test": "grunt simplemocha"
   },
   "devDependencies": {
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt-contrib-clean": "~0.5.0",
-    "grunt-coffeelint": "0.0.8",
-    "grunt-simple-mocha": "0.4.0",
-    "should": "~3.1.2",
-    "grunt": "~0.4.2",
-    "supertest": "~0.9.0",
-    "sinon": "~1.8.2",
-    "hubot": "~2.7.1",
-    "grunt-contrib-copy": "~0.5.0",
-    "grunt-contrib-coffee": "~0.10.1",
-    "grunt-contrib-jshint": "~0.8.0"
+    "grunt-contrib-watch": "~1.0.0",
+    "grunt-contrib-clean": "~1.0.0",
+    "grunt-coffeelint": "0.0.16",
+    "grunt-simple-mocha": "~0.4.0",
+    "should": "~11.1.0",
+    "grunt": "~1.0.1",
+    "supertest": "~2.0.0",
+    "sinon": "~1.17.5",
+    "hubot": "~2.19.0"
   },
   "keywords": [
-    "hubot"
+    "hubot",
+    "hubot-scripts",
+    "jenkins"
   ],
   "dependencies": {}
 }
