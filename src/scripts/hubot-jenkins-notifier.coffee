@@ -33,6 +33,48 @@
 #   halkeye
 #   spajus
 #   k9ert (notification strategy feature)
+#
+# Sample data sent from Jenkins plugin for job "jobname":
+# STARTED:
+#
+#{ name: 'jobname',
+#  url: 'job/jobname/',
+#  build:
+#  { number: 5,
+#    queue_id: 5,
+#    phase: 'STARTED',
+#    url: 'job/jobname/5/',
+#    scm: {},
+#    log: '',
+#    artifacts: {} } }
+#
+# COMPLETED
+#
+#{ name: 'jobname',
+#  url: 'job/jobname/',
+#  build:
+#  { number: 5,
+#    queue_id: 5,
+#    phase: 'COMPLETED',
+#    status: 'SUCCESS',
+#    url: 'job/jobname/5/',
+#    scm: {},
+#    log: '',
+#    artifacts: {} } }
+#
+# FINALIZED
+#
+#{ name: 'jobname',
+#  url: 'job/jobname/',
+#  build:
+#  { number: 5,
+#    queue_id: 5,
+#    phase: 'FINALIZED',
+#    status: 'SUCCESS',
+#    url: 'job/jobname/5/',
+#    scm: {},
+#    log: '',
+#    artifacts: {} } }
 
 'use strict'
 
@@ -50,6 +92,9 @@ class JenkinsNotifier
   reset: ->
     @failing = []
 
+  storeAsFailed: (name) ->
+    @failing.push name unless name in @failing
+
   error: (err, body) ->
     console.log "jenkins-notify error: #{err.message}. Data: #{util.inspect(body)}"
     console.log err.stack
@@ -59,6 +104,10 @@ class JenkinsNotifier
       console.log message
 
   shouldNotify: (notstrat, data) ->
+    if data.build.phase == 'STARTED'
+      if /F/.test(notstrat)
+        return true
+      return @lastBuildFailed(data, @failing)
     if data.build.status == 'FAILURE'
       if /F/.test(notstrat)
         return true
@@ -68,14 +117,20 @@ class JenkinsNotifier
         return true
       return @buildStatusChanged(data, @failing)
 
+  lastBuildFailed: (data) ->
+    return data.name in @failing
+
+  lastBuildSucceeded: (data) ->
+    return not @lastBuildFailed(data, @failing)
+
   buildStatusChanged: (data) ->
-    if data.build.status == 'FAILURE' and data.name in @failing
+    if data.build.status == 'FAILURE' and @lastBuildFailed(data, @failing)
       return false
-    if data.build.status == 'FAILURE' and not (data.name in @failing)
+    if data.build.status == 'FAILURE' and @lastBuildSucceeded(data, @failing)
       return true
-    if data.build.status == 'SUCCESS' and data.name in @failing
+    if data.build.status == 'SUCCESS' and @lastBuildFailed(data, @failing)
       return true
-    if data.build.status == 'SUCCESS' and not (data.name in @failing)
+    if data.build.status == 'SUCCESS' and @lastBuildSucceeded(data, @failing)
       return false
     console.log "this should not happen"
 
@@ -158,7 +213,8 @@ class JenkinsNotifier
     @logMessage(query.trace, "#{data.name} #{data.build.phase} #{data.build.status}")
 
     if data.build.phase in ['STARTED']
-      @robot.send envelope, "#{data.name} build ##{data.build.number} started: #{fullurl}"
+      if @shouldNotify(envelope.notstrat, data)
+        @robot.send envelope, "#{data.name} build ##{data.build.number} started: #{fullurl}"
       return
 
     if data.build.phase in ['FINISHED', 'FINALIZED']
@@ -176,7 +232,7 @@ class JenkinsNotifier
           @robot.send envelope, message
         else
           @logMessage(query.trace, "Not sending message, not necessary")
-        @failing.push data.name unless data.name in @failing
+        @storeAsFailed(data.name)
 
       if data.build.status == 'SUCCESS'
         if data.name in @failing
