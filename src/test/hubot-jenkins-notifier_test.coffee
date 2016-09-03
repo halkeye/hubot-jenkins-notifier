@@ -4,6 +4,7 @@ Hubot = require('hubot')
 Path = require('path')
 request = require('supertest')
 sinon = require('sinon')
+should = require('should')
 
 adapterPath = Path.join Path.dirname(require.resolve 'hubot'), "src", "adapters"
 robot = Hubot.loadBot adapterPath, "shell", true, "MochaHubot"
@@ -93,15 +94,14 @@ test_data = [
     }
   },
   {
-    "name": "started-failed",
-    "expected_out": false,
+    "name": "started",
+    "expected_out": "JobName build #2 started: http://ci.jenkins.org/job/project name/5",
     "body": {
       "name":"JobName",
       "url":"JobUrl",
       "build":{
         "number":2,
         "phase":"STARTED",
-        "status":"FAILED",
         "url":"job/project%20name/5",
         "full_url":"http://ci.jenkins.org/job/project%20name/5"
         "parameters":{"branch":"master"}
@@ -109,18 +109,18 @@ test_data = [
     }
   },
   {
-    "name": "started-finalized",
-    "expected_out": false,
+    "name": "started-with-previous-failed",
+    "expected_out": "JobName build #2 started: http://ci.jenkins.org/job/project name/5",
+    "previousBuildFailed": true,
     "body": {
-      "name":"JobName",
-      "url":"JobUrl",
-      "build":{
-        "number":2,
-        "phase":"STARTED",
-        "status":"FINALIZED",
-        "url":"job/project%20name/5",
-        "full_url":"http://ci.jenkins.org/job/project%20name/5"
-        "parameters":{"branch":"master"}
+      "name": "JobName",
+      "url": "JobUrl",
+      "build": {
+        "number": 2,
+        "phase": "STARTED",
+        "url": "job/project%20name/5",
+        "full_url": "http://ci.jenkins.org/job/project%20name/5"
+        "parameters": {"branch": "master"}
       }
     }
   }
@@ -140,6 +140,9 @@ for test in test_data then do (test) ->
         endfunc = (err, res) ->
           throw err if err
           do done
+        if test.previousBuildFailed
+          console.log "Marking job as previously failed", test.body.name
+          robot.jenkins_notifier.storeAsFailed(test.body.name)
         request(robot.router)
           .post(url)
           .send(JSON.stringify(test.body))
@@ -155,6 +158,9 @@ for test in test_data then do (test) ->
         if test.expected_out == false
           # previous test will test this
         else
+          should.exist(robot.adapter.send.getCall(0))
+          should.exist(robot.adapter.send.getCall(0).args)
+          robot.adapter.send.getCall(0).args.should.be.Array
           send_arg = robot.adapter.send.getCall(0).args[0]
           send_arg.user.room.should.eql '#halkeye'
           send_arg.room.should.eql '#halkeye'
@@ -162,5 +168,62 @@ for test in test_data then do (test) ->
         if test.expected_out == false
           # previous test will test this
         else
+          should.exist(robot.adapter.send.getCall(0))
+          should.exist(robot.adapter.send.getCall(0).args)
+          robot.adapter.send.getCall(0).args.should.be.Array
           robot.adapter.send.getCall(0).args[1].should.eql test.expected_out
 
+badUrls = [
+  {
+    name: "",
+    url: "/hubot/jenkins-notify?room=%23halkeye&user=someusername",
+    expectedResponse: "",
+    expectedResponseCode: 400,
+    body: {
+      "name":"JobName",
+      "url":"JobUrl",
+      "build":{
+        "number":1,
+        "phase":"FINISHED",
+        "status":"FAILURE",
+        "url":"job/project%20name/5",
+        "full_url":"http://ci.jenkins.org/job/project%20name/5"
+        "parameters":{"branch":"master"}
+      }
+    }
+  }, {
+    name: "",
+    url: "/hubot/jenkins-notify",
+    expectedResponse: "",
+    expectedResponseCode: 400,
+    body: {
+      "name":"JobName",
+      "url":"JobUrl",
+      "build":{
+        "number":1,
+        "phase":"FINISHED",
+        "status":"FAILURE",
+        "url":"job/project%20name/5",
+        "full_url":"http://ci.jenkins.org/job/project%20name/5"
+        "parameters":{"branch":"master"}
+      }
+    }
+  }
+]
+
+for badUrl in badUrls then do (badUrl) ->
+  describe badUrl.name + ': ' + badUrl.url, ()->
+    before (done) ->
+      robot.jenkins_notifier.reset()
+      robot.adapter.send = sinon.spy()
+      endfunc = (err, res) ->
+        throw err if err
+        do done
+      request(robot.router)
+        .post(badUrl.url)
+        .send(JSON.stringify(badUrl.body))
+        .expect(badUrl.expectedResponseCode)
+        .end(endfunc)
+      return
+    it 'Robot sent out correct response code', ()->
+      robot.adapter.send.called.should.be.false

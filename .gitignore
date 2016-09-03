@@ -1,3 +1,5 @@
 /node_modules/
 npm-debug.log
 /out/
+.idea/
+standalone-endpoint-server/node_modules/
