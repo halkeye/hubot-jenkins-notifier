@@ -179,7 +179,7 @@ JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.protot
 
     if (this.shouldNotify(data)) {
       var message = data.name + " build #" + data.build.number + " " + build + " failing: " + this.getFullUrl(data);
-      if ((data.build.log !== null) && data.build.log.length !== 0) {
+      if (data.build.log) {
         message = message + "\r\n" + data.build.log;
       }
       return [message];
