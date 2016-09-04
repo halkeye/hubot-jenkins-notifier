@@ -10,10 +10,9 @@
 #   or <HUBOT_URL>:<PORT>/hubot/jenkins-notify?user=<user>
 #   Notification config. See here: https://wiki.jenkins-ci.org/display/JENKINS/Notification+Plugin
 #   Optional Params:
-#     always_notify: always notify even on success
-#     notstrat: Notification strategy, please see below
-#     always_notify: always notify even on success
-#     trace: trace the received JSON object
+#     onStart: Notification strategy for jobs starting, please see below
+#     onFinished: Notification strategy for jobs finishing, please see below
+#     trace: add a bunch of runtime console.log
 #
 # Commands:
 #   None
@@ -22,7 +21,7 @@
 #   POST /hubot/jenkins-notify?[room=<room>|user=<user>][&type=<type>][&onFinished=<notificationStrategy>][&onStart=<notificationStrategy>][&trace=1]
 #
 # Notes:
-#   Copyright (c) 2013 Gavin Mogan
+#   Copyright (c) 2013, 2016 Gavin Mogan
 #   Licensed under the MIT license.
 #
 # Notification Strategy is [Ff][Ss] which stands for "Failure" and "Success"
