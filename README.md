@@ -22,10 +22,8 @@ As url parameters the following can be used:
 
 * `room`: The room name to send the message to. Mutually exlusive with `user`
 * `user`: The user name to send the private message to. Mutually exlusive with `room`
-* `always_notify`: always notify even on success
-* `notstrat`: Notification strategy: [Ff][Ss] which stands for "Failure" and "Success". Capitalized letter means: notify always. Small letter means: notify only if buildstatus has changed
-  "Fs" is the default
-* `trace`: enable tracing for diagnostics
+* `onStart`/`onFinished`: Notification strategy: [Ff][Ss] which stands for "Failure" and "Success". Capitalized letter means: notify always. Small letter means: notify only if buildstatus has changed
+* `trace`: add a bunch of runtime console.log's
 
 Environment variable:
 
@@ -33,11 +31,11 @@ Environment variable:
 
 ## Release History
 
-0.2.0 - 2016-07-30
+1.0.0 - 2016-09-05
 
 * Added parameter `user`, `trace`
 * Updated documentation to reflect changes in jenkins notification plugin
-* Added traces and logs
+* Big rewrite, clearer testing, code, etc
 
 0.1.5 - 2014-09-18
 
