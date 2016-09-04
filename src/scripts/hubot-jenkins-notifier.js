@@ -73,7 +73,7 @@ JenkinsNotifierRequest.buildEnvelope = function(query) {
     envelope.onStart = query.onStart || '';
     envelope.onFinished = query.onFinished || '';
   }
-  
+
   if (query.type) { envelope.user.type = query.type; }
   if (query.user && query.room) {
     throw new Error("Cannot use room (" + query.room + ") and user together (" + query.user + ")");
@@ -88,7 +88,7 @@ JenkinsNotifierRequest.buildEnvelope = function(query) {
 
 JenkinsNotifierRequest.prototype.setFailed = function(failed) {
   this.failed = failed;
-} 
+}
 
 JenkinsNotifierRequest.prototype.setQuery = function(q) {
   this.query = q;
@@ -100,7 +100,7 @@ JenkinsNotifierRequest.prototype.getQuery = function() {
 
 JenkinsNotifierRequest.prototype.logMessage = function(message) {
   if (this.query.trace || process.env.JENKINS_NOTIFIER_TRACE) {
-     return console.log(message); 
+     return console.log(message);
   }
 }
 
@@ -122,7 +122,7 @@ JenkinsNotifierRequest.prototype.processStarted = function(data) {
 }
 
 JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.prototype.onFinalized = function(data) {
-  var build;  
+  var build;
   if (data.build.status === 'FAILURE') {
     build = "started";
     if (this.failed[data.name]) {
@@ -140,7 +140,7 @@ JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.protot
       this.logMessage("Not sending message, not necessary");
     }
   }
-  
+
   if (data.build.status === 'SUCCESS') {
     build = "succeeded";
     if (this.failed[data.name]) {
@@ -154,14 +154,14 @@ JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.protot
       this.logMessage("Not sending message, not necessary");
     }
   }
-  
+
   return [];
-} 
+}
 
 JenkinsNotifierRequest.prototype.process = function(data) {
   /* if we have a handler, then handle it */
-  var func = this['process' + lodash.upperFirst(data.build.phase.toLowerCase())].bind(this);
-  if (func) { return func(data); }
+  var func = this['process' + lodash.upperFirst(data.build.phase.toLowerCase())];
+  if (func) { return func.call(this, data); }
   return [];
 }
 
@@ -213,7 +213,7 @@ var JenkinsNotifier = (function() {
     if (body === false) {
       body = this.dataMethodRaw(req);
     }
-     
+
     try {
       if (!body || typeof body.build !== 'object') {
         throw new Error("Unable to process data - data empty or not an object");
@@ -225,7 +225,7 @@ var JenkinsNotifier = (function() {
       notifier.logMessage(body.name + " " + body.build.phase + " " + body.build.status);
 
       var messages = notifier.process(body);
-      
+
       /* Send out all the messages */
       var envelope = JenkinsNotifierRequest.buildEnvelope(notifier.getQuery());
       lodash.forEach(messages, function(msg) { this.robot.send(envelope, msg); }.bind(this));
@@ -233,9 +233,9 @@ var JenkinsNotifier = (function() {
       res.status(200).end('');
     } catch (err) {
       console.log("jenkins-notify error: " + err.message + ". Data: " + (util.inspect(body)));
-      //console.log(err.stack);
+      console.log(err.stack);
       res.status(400).end(err.message);
-    }    
+    }
   };
 
   return JenkinsNotifier;
