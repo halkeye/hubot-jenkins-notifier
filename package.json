@@ -2,6 +2,7 @@
   "name": "hubot-jenkins-notifier",
   "description": "Notifies about Jenkins build errors via Jenkins Notification Plugin",
   "version": "0.2.0",
+  "license": "MIT",
   "homepage": "https://github.com/halkeye/hubot-jenkins-notifier",
   "author": {
     "name": "Gavin Mogan",
@@ -26,23 +27,22 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "grunt simplemocha"
+    "test": "mocha"
   },
   "devDependencies": {
-    "grunt-contrib-watch": "~1.0.0",
-    "grunt-contrib-clean": "~1.0.0",
-    "grunt-coffeelint": "0.0.16",
-    "grunt-simple-mocha": "~0.4.0",
+    "eslint": "^3.4.0",
+    "hubot": "~2.19.0",
+    "mocha": "^3.0.2",
     "should": "~11.1.0",
-    "grunt": "~1.0.1",
-    "supertest": "~2.0.0",
     "sinon": "~1.17.5",
-    "hubot": "~2.19.0"
+    "supertest": "~2.0.0"
   },
   "keywords": [
     "hubot",
     "hubot-scripts",
     "jenkins"
   ],
-  "dependencies": {}
+  "dependencies": {
+    "lodash": "^4.15.0"
+  }
 }
