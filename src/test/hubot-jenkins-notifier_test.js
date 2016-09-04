@@ -128,7 +128,7 @@ describe("JenkinsNotifier", function() {
 
       jenkinsNotifier.process({
         url: "/hubot/jenkins-notify?room=%23halkeye&onStart=FS&onFinished=FS",
-        body: commonBodies["FINISHED_FAILURE"]
+        body: commonBodies.FINISHED_FAILURE
       }, res);
 
       should(res.code).have.eql(200);
@@ -141,20 +141,20 @@ var test_data = [
   {
     "name": "finished-failed",
     "expected_out": ["JobName build #1 started failing: http://ci.jenkins.org/job/project name/5"],
-    "body": commonBodies["FINISHED_FAILURE_fullURL"]
+    "body": commonBodies.FINISHED_FAILURE_fullURL
   }, {
     "name": "finished-failed-nofull_url",
     "expected_out": ["JobName build #1 started failing: job/project name/5"],
-    "body": commonBodies["FINISHED_FAILURE"]
+    "body": commonBodies.FINISHED_FAILURE
   }, {
     "name": "started",
     "expected_out": ["JobName build #2 started: http://ci.jenkins.org/job/project name/5"],
-    "body": commonBodies["STARTED"]
+    "body": commonBodies.STARTED
   }, {
     "name": "started-with-previous-failed",
     "expected_out": ["JobName build #2 started: http://ci.jenkins.org/job/project name/5"],
     "previousBuildFailed": true,
-    "body": commonBodies["STARTED"]
+    "body": commonBodies.STARTED
   }
 ];
 test_data.forEach(function(test) {
@@ -164,9 +164,9 @@ test_data.forEach(function(test) {
       //this.room = scriptHelper.createRoom();
       this.notifier = new JenkinsNotifierRequest();
       if (test.previousBuildFailed) {
-        var failed = this.notifier.getFailed();
+        var failed = this.notifier.getFailing();
         failed[test.body.name] = 1;
-        this.notifier.setFailed(failed);
+        this.notifier.setFailing(failed);
       }
       this.notifier.setQuery(JenkinsNotifierRequest.buildQueryObject(
         "/hubot/jenkins-notify?room=%23halkeye&onStart=FS&onFinished=FS"

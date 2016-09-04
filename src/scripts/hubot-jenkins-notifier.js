@@ -46,7 +46,7 @@ var lodash = require('lodash');
 
 var JenkinsNotifierRequest = function() {
   this.query = {};
-  this.failed = {};
+  this.failing = {};
   events.EventEmitter.call(this);
 };
 JenkinsNotifierRequest.prototype.__proto__ = events.EventEmitter.prototype;
@@ -86,12 +86,12 @@ JenkinsNotifierRequest.buildEnvelope = function(query) {
   return envelope;
 }
 
-JenkinsNotifierRequest.prototype.setFailed = function(failed) {
-  this.failed = failed;
+JenkinsNotifierRequest.prototype.setFailing = function(failing) {
+  this.failing = failing;
 }
 
-JenkinsNotifierRequest.prototype.getFailed = function() {
-  return this.failed;
+JenkinsNotifierRequest.prototype.getFailing = function() {
+  return this.failing;
 }
 
 JenkinsNotifierRequest.prototype.setQuery = function(q) {
@@ -129,7 +129,7 @@ JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.protot
   var build;
   if (data.build.status === 'FAILURE') {
     build = "started";
-    if (this.failed[data.name]) {
+    if (this.failing[data.name]) {
       build = "is still";
     }
     this.emit('handleFailed', data.name);
@@ -178,10 +178,6 @@ var JenkinsNotifier = (function() {
     this.failing = {};
   }
 
-  JenkinsNotifier.prototype.reset = function() {
-    return this.failing = {};
-  };
-
   JenkinsNotifier.prototype.dataMethodJSONParse = function(req) {
     var ret;
     if (typeof req.body !== 'object') {
@@ -222,7 +218,7 @@ var JenkinsNotifier = (function() {
       if (!body || typeof body.build !== 'object') {
         throw new Error("Unable to process data - data empty or not an object");
       }
-      notifier.setFailed(this.failing);
+      notifier.setFailing(this.failing);
       notifier.setQuery(JenkinsNotifierRequest.buildQueryObject(req.url));
       notifier.logMessage("jenkins-notifier: Incoming request at " + req.url);
       notifier.logMessage(body.build);
