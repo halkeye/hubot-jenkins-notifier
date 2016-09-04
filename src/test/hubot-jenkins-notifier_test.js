@@ -45,6 +45,19 @@ var commonBodies = {
       }
     }
   },
+  "FINISHED_SUCCESS": {
+    "name": "JobName",
+    "url": "JobUrl",
+    "build": {
+      "number": 1,
+      "phase": "FINISHED",
+      "status": "SUCCESS",
+      "url": "job/project name/5",
+      "parameters": {
+        "branch": "master"
+      }
+    }
+  },
   "STARTED":{
     "name": "JobName",
     "url": "JobUrl",
@@ -72,6 +85,88 @@ var commonBodies = {
     }
   },
 }
+
+describe("JenkinsNotifier.shouldNotify", function() {
+  describe("started job", function() {
+    it("started job, previous job failed, and onStarted=S", function() {
+      var notifier = new JenkinsNotifierRequest();
+      notifier.setStatus("FAILURE");
+      notifier.setQuery({onStart: 'S' });
+      should(notifier.shouldNotify(commonBodies.STARTED)).be.false();
+    });
+    it("previous job failed, and onStarted=F", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("FAILURE");
+        notifier.setQuery({onStart: 'F' });
+        should(notifier.shouldNotify(commonBodies.STARTED)).be.true();
+    });
+    it("previous job success, and onStarted=S", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("SUCCESS");
+        notifier.setQuery({onStart: 'S' });
+        should(notifier.shouldNotify(commonBodies.STARTED)).be.true();
+    });
+    it("previous job success, and onStarted=F", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("SUCCESS");
+        notifier.setQuery({onStart: 'F' });
+        should(notifier.shouldNotify(commonBodies.STARTED)).be.false();
+    });
+  });
+  describe("finished job - failure", function() {
+    it("previous job failed, and onFinished=S", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("FAILURE");
+        notifier.setQuery({onFinished: 'S' });
+        should(notifier.shouldNotify(commonBodies.FINISHED_FAILURE)).be.false();
+    });
+    it("previous job failed, and onFinished=F", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("FAILURE");
+        notifier.setQuery({onFinished: 'F' });
+        should(notifier.shouldNotify(commonBodies.FINISHED_FAILURE)).be.true();
+    });
+    it("previous job success, and onFinished=S", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("SUCCESS");
+        notifier.setQuery({onFinished: 'S' });
+        should(notifier.shouldNotify(commonBodies.FINISHED_FAILURE)).be.false();
+    });
+    it("previous job success, and onFinished=F", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("SUCCESS");
+        notifier.setQuery({onFinished: 'F' });
+        should(notifier.shouldNotify(commonBodies.FINISHED_FAILURE)).be.true();
+    });
+  });
+  describe("finished job - success", function() {
+        it("previous job failed, and onFinished=S", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("FAILURE");
+        notifier.setQuery({onFinished: 'S' });
+        should(notifier.shouldNotify(commonBodies.FINISHED_SUCCESS)).be.true();
+    });
+    it("previous job failed, and onFinished=F", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("FAILURE");
+        notifier.setQuery({onFinished: 'F' });
+        should(notifier.shouldNotify(commonBodies.FINISHED_SUCCESS)).be.false();
+    });
+    it("previous job success, and onFinished=S", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("SUCCESS");
+        notifier.setQuery({onFinished: 'S' });
+        should(notifier.shouldNotify(commonBodies.FINISHED_SUCCESS)).be.true();
+    });
+    it("previous job success, and onFinished=F", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("SUCCESS");
+        notifier.setQuery({onFinished: 'F' });
+        should(notifier.shouldNotify(commonBodies.FINISHED_SUCCESS)).be.false();
+    });
+  });
+});
+
 describe("JenkinsNotifierRequest.buildEnvelope", function() {
   it("username and room should throw exception", function() {
     (function(){
@@ -164,9 +259,7 @@ test_data.forEach(function(test) {
       //this.room = scriptHelper.createRoom();
       this.notifier = new JenkinsNotifierRequest();
       if (test.previousBuildFailed) {
-        var failed = this.notifier.getFailing();
-        failed[test.body.name] = 1;
-        this.notifier.setFailing(failed);
+        this.notifier.setStatus("FAILURE");
       }
       this.notifier.setQuery(JenkinsNotifierRequest.buildQueryObject(
         "/hubot/jenkins-notify?room=%23halkeye&onStart=FS&onFinished=FS"

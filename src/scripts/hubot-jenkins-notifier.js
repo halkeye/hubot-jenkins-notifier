@@ -45,7 +45,7 @@ var lodash = require('lodash');
 
 var JenkinsNotifierRequest = function() {
   this.query = {};
-  this.failing = {};
+  this.status = "";
   events.EventEmitter.call(this);
 };
 JenkinsNotifierRequest.prototype.__proto__ = events.EventEmitter.prototype;
@@ -85,12 +85,12 @@ JenkinsNotifierRequest.buildEnvelope = function(query) {
   return envelope;
 }
 
-JenkinsNotifierRequest.prototype.setFailing = function(failing) {
-  this.failing = failing;
+JenkinsNotifierRequest.prototype.setStatus = function(status) {
+  this.status = status;
 }
 
-JenkinsNotifierRequest.prototype.getFailing = function() {
-  return this.failing;
+JenkinsNotifierRequest.prototype.getStatus = function() {
+  return this.status;
 }
 
 JenkinsNotifierRequest.prototype.setQuery = function(q) {
@@ -116,9 +116,53 @@ JenkinsNotifierRequest.prototype.processCompleted = function() {
   return [];
 }
 
+JenkinsNotifierRequest.prototype.shouldNotify = function(data) {
+  // Notification Strategy is [Ff][Ss] which stands for "Failure" and "Success"
+  // Capitalized letter means: notify always
+  // small letter means: notify only if buildstatus has changed
+  
+  if (data.build.phase == 'STARTED') {
+    // last job was a failure 
+    if (this.status === 'FAILURE') {
+      if (/F/.test(this.query.onStart)) {
+        return true;
+      }
+    }
+    // last job was a success 
+    if (this.status === 'SUCCESS') {
+      if (/S/.test(this.query.onStart)) {
+        return true;
+      }
+    }
+    // unknown status, so output if any notification for start
+    if (!this.status) {
+      return !!this.query.onStart;
+    }
+  }
+
+  if (data.build.status == 'FAILURE') {
+    if (/F/.test(this.query.onFinished)) {
+      return true
+    }
+    if (/f/.test(this.query.onFinished)) {
+      return data.build.status !== this.status;
+    }
+  }
+
+  if (data.build.status == 'SUCCESS') {
+    if (/S/.test(this.query.onFinished)) {
+      return true
+    }
+    if (/s/.test(this.query.onFinished)) {
+      return data.build.status !== this.status;
+    }
+  }
+  return false;
+}
+
 JenkinsNotifierRequest.prototype.processStarted = function(data) {
   this.emit('handleSuccess', data.name);
-  if (/S/.test(this.query.onStart) || (/s/.test(this.query.onStart) && this.failed[data.name])) {
+  if (this.shouldNotify(data)) {
     return [data.name + " build #" + data.build.number + " started: " + this.getFullUrl(data)];
   }
   return [];
@@ -128,12 +172,12 @@ JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.protot
   var build;
   if (data.build.status === 'FAILURE') {
     build = "started";
-    if (this.failing[data.name]) {
+    if (this.status === 'FAILURE') {
       build = "is still";
     }
     this.emit('handleFailed', data.name);
 
-    if (/F/.test(this.query.onFinished)) {
+    if (this.shouldNotify(data)) {
       var message = data.name + " build #" + data.build.number + " " + build + " failing: " + this.getFullUrl(data);
       if ((data.build.log != null) && data.build.log.length !== 0) {
         message = message + "\r\n" + data.build.log;
@@ -146,7 +190,7 @@ JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.protot
 
   if (data.build.status === 'SUCCESS') {
     build = "succeeded";
-    if (this.failed[data.name]) {
+    if (this.lastStatus[data.name] === 'FAILURE') {
       build = "was restored";
     }
     this.emit('handleSuccess', data.name);
@@ -174,7 +218,7 @@ JenkinsNotifierRequest.prototype.process = function(data) {
 var JenkinsNotifier = (function() {
   function JenkinsNotifier(robot) {
     this.robot = robot;
-    this.failing = {};
+    this.statuses = {};
   }
 
   JenkinsNotifier.prototype.dataMethodJSONParse = function(req) {
@@ -204,8 +248,8 @@ var JenkinsNotifier = (function() {
 
   JenkinsNotifier.prototype.process = function(req, res) {
     var notifier = new JenkinsNotifierRequest();
-    notifier.on('handleFailed', function(build) { this.failing[build.name] = 1; }.bind(this));
-    notifier.on('handleSuccess', function(build) { delete this.failing[build.name]; }.bind(this));
+    notifier.on('handleFailed', function(build) { this.statuses[build.name] = 'FAILURE'; }.bind(this));
+    notifier.on('handleSuccess', function(build) { this.statuses[build.name] = 'SUCCESS'; }.bind(this));
 
     // FIXME - pretty sure we can now depend on express to process the body
     var body = this.dataMethodJSONParse(req);
@@ -217,7 +261,7 @@ var JenkinsNotifier = (function() {
       if (!body || typeof body.build !== 'object') {
         throw new Error("Unable to process data - data empty or not an object");
       }
-      notifier.setFailing(this.failing);
+      notifier.setStatus(this.statuses[body.name]);
       notifier.setQuery(JenkinsNotifierRequest.buildQueryObject(req.url));
       notifier.logMessage("jenkins-notifier: Incoming request at " + req.url);
       notifier.logMessage(body.build);
