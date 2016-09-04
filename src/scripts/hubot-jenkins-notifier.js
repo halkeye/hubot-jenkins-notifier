@@ -90,6 +90,10 @@ JenkinsNotifierRequest.prototype.setFailed = function(failed) {
   this.failed = failed;
 }
 
+JenkinsNotifierRequest.prototype.getFailed = function() {
+  return this.failed;
+}
+
 JenkinsNotifierRequest.prototype.setQuery = function(q) {
   this.query = q;
 }
@@ -228,7 +232,9 @@ var JenkinsNotifier = (function() {
 
       /* Send out all the messages */
       var envelope = JenkinsNotifierRequest.buildEnvelope(notifier.getQuery());
-      lodash.forEach(messages, function(msg) { this.robot.send(envelope, msg); }.bind(this));
+      lodash.forEach(messages, function(msg) {
+        this.robot.send(envelope, msg); 
+      }.bind(this));
 
       res.status(200).end('');
     } catch (err) {
@@ -246,8 +252,9 @@ module.exports = function(robot) {
   robot.jenkins_notifier = new JenkinsNotifier(robot);
   console.log("Jenkins Notifier Hubot script started. Awaiting requests.");
 
-  return robot.router.post("/hubot/jenkins-notify", function(req, res) {
+  robot.router.post("/hubot/jenkins-notify", function(req, res) {
     return robot.jenkins_notifier.process(req, res);
   });
+  return robot.jenkins_notifier;
 };
 module.exports.JenkinsNotifierRequest = JenkinsNotifierRequest;
