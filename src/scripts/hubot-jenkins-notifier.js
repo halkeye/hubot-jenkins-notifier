@@ -121,7 +121,7 @@ JenkinsNotifierRequest.prototype.shouldNotify = function(data) {
   // Capitalized letter means: notify always
   // small letter means: notify only if buildstatus has changed
   
-  if (data.build.phase == 'STARTED') {
+  if (data.build.phase === 'STARTED') {
     // last job was a failure 
     if (this.status === 'FAILURE') {
       if (/F/.test(this.query.onStart)) {
@@ -140,7 +140,7 @@ JenkinsNotifierRequest.prototype.shouldNotify = function(data) {
     }
   }
 
-  if (data.build.status == 'FAILURE') {
+  if (data.build.status === 'FAILURE') {
     if (/F/.test(this.query.onFinished)) {
       return true
     }
@@ -149,7 +149,7 @@ JenkinsNotifierRequest.prototype.shouldNotify = function(data) {
     }
   }
 
-  if (data.build.status == 'SUCCESS') {
+  if (data.build.status === 'SUCCESS') {
     if (/S/.test(this.query.onFinished)) {
       return true
     }
@@ -179,7 +179,7 @@ JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.protot
 
     if (this.shouldNotify(data)) {
       var message = data.name + " build #" + data.build.number + " " + build + " failing: " + this.getFullUrl(data);
-      if ((data.build.log != null) && data.build.log.length !== 0) {
+      if ((data.build.log !== null) && data.build.log.length !== 0) {
         message = message + "\r\n" + data.build.log;
       }
       return [message];
