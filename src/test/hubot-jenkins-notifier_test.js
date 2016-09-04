@@ -50,7 +50,7 @@ describe("JenkinsNotifierRequest.buildEnvelope", function() {
       onFinished: '',
       user: { room: '#halkeye' },
       room: '#halkeye'
-    });  
+    });
   });
   it("onFinished", function() {
     var envelope = JenkinsNotifierRequest.buildEnvelope(JenkinsNotifierRequest.buildQueryObject("/hubot/jenkins-notify?room=%23halkeye&onFinished=FS"));
@@ -59,7 +59,7 @@ describe("JenkinsNotifierRequest.buildEnvelope", function() {
       onFinished: 'FS',
       user: { room: '#halkeye' },
       room: '#halkeye'
-    });  
+    });
   });
 });
 
