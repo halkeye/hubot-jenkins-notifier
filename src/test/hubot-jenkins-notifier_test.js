@@ -87,6 +87,7 @@ var commonBodies = {
 }
 
 describe("JenkinsNotifier.shouldNotify", function() {
+  /* TODO: add unknown status tests */
   describe("started job", function() {
     it("started job, previous job failed, and onStarted=S", function() {
       var notifier = new JenkinsNotifierRequest();
