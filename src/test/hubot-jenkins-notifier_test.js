@@ -6,6 +6,8 @@ require("coffee-script/register");
 var Hubot = require('hubot');
 var Path = require('path');
 var should = require('should');
+should.config.checkProtoEql = false;
+
 
 var adapterPath = Path.join(Path.dirname(require.resolve('hubot')), "src", "adapters");
 var robot = Hubot.loadBot(adapterPath, "shell", true, "MochaHubot");
@@ -232,39 +234,37 @@ describe("JenkinsNotifierRequest.buildEnvelope", function() {
       ));
     }).should.throw();
   });
+});
+describe("JenkinsNotifierRequest.buildQueryObject", function() {
   it("always_notify", function() {
-    var envelope = JenkinsNotifierRequest.buildEnvelope(JenkinsNotifierRequest.buildQueryObject("/hubot/jenkins-notify?room=%23halkeye&always_notify=1"));
-    should(envelope).have.eql({
+    var query = JenkinsNotifierRequest.buildQueryObject("/hubot/jenkins-notify?room=%23halkeye&always_notify=1");
+    should(query).have.eql({
       onStart: '',
       onFinished: 'FS',
-      user: { room: '#halkeye' },
       room: '#halkeye'
     });
   });
   it("notstrat", function() {
-    var envelope = JenkinsNotifierRequest.buildEnvelope(JenkinsNotifierRequest.buildQueryObject("/hubot/jenkins-notify?room=%23halkeye&notstrat=FS"));
-    should(envelope).have.eql({
+    var query = JenkinsNotifierRequest.buildQueryObject("/hubot/jenkins-notify?room=%23halkeye&notstrat=FS");
+    should(query).have.eql({
       onStart: '',
       onFinished: 'FS',
-      user: { room: '#halkeye' },
       room: '#halkeye'
     });
   });
   it("onStart", function() {
-    var envelope = JenkinsNotifierRequest.buildEnvelope(JenkinsNotifierRequest.buildQueryObject("/hubot/jenkins-notify?room=%23halkeye&onStart=FS"));
-    should(envelope).have.eql({
+    var query = JenkinsNotifierRequest.buildQueryObject("/hubot/jenkins-notify?room=%23halkeye&onStart=FS");
+    should(query).have.eql({
       onStart: 'FS',
       onFinished: '',
-      user: { room: '#halkeye' },
       room: '#halkeye'
     });
   });
   it("onFinished", function() {
-    var envelope = JenkinsNotifierRequest.buildEnvelope(JenkinsNotifierRequest.buildQueryObject("/hubot/jenkins-notify?room=%23halkeye&onFinished=FS"));
-    should(envelope).have.eql({
+    var query = JenkinsNotifierRequest.buildQueryObject("/hubot/jenkins-notify?room=%23halkeye&onFinished=FS");
+    should(query).have.eql({
       onStart: '',
       onFinished: 'FS',
-      user: { room: '#halkeye' },
       room: '#halkeye'
     });
   });

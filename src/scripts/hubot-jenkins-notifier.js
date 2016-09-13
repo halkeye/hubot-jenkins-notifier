@@ -51,27 +51,30 @@ var JenkinsNotifierRequest = function() {
 JenkinsNotifierRequest.prototype.__proto__ = events.EventEmitter.prototype;
 
 JenkinsNotifierRequest.buildQueryObject = function(urlStr) {
-  return querystring.parse(url.parse(urlStr).query);
+  var query = querystring.parse(url.parse(urlStr).query);
+
+  if (typeof query.onStart === 'undefined' && typeof query.onFinished === 'undefined') {
+    if (query.notstrat) {
+      query.onFinished = query.notstrat;
+    } else if (query.always_notify) {
+      query.onFinished = 'FS';
+    } else {
+      query.onFinished = 'Fs';
+    }
+  }
+
+  query.onStart = query.onStart || '';
+  query.onFinished = query.onFinished || '';
+
+  delete query.notstrat;
+  delete query.always_notify;
+  return query;
 }
 
 JenkinsNotifierRequest.buildEnvelope = function(query) {
   var envelope = {
-    onStart: "",
-    onFinished: "",
     user: {}
   };
-  if (typeof query.onStart === 'undefined' && typeof query.onFinished === 'undefined') {
-    if (query.notstrat) {
-      envelope.onFinished = query.notstrat;
-    } else if (query.always_notify) {
-      envelope.onFinished = 'FS';
-    } else {
-      envelope.onFinished = 'Fs';
-    }
-  } else {
-    envelope.onStart = query.onStart || '';
-    envelope.onFinished = query.onFinished || '';
-  }
 
   if (query.type) { envelope.user.type = query.type; }
   if (query.user && query.room) {
