@@ -18,6 +18,75 @@ var jenkinsNotifier = JenkinsNotifier(robot);
 var JenkinsNotifierRequest = JenkinsNotifier.JenkinsNotifierRequest;
 
 var commonBodies = {
+  "STARTED":{
+    "name": "JobName",
+    "url": "JobUrl",
+    "build": {
+      "number": 2,
+      "phase": "STARTED",
+      "url": "job/project name/5",
+      "full_url": "http://ci.jenkins.org/job/project name/5",
+      "parameters": {
+        "branch": "master"
+      }
+    }
+  },
+  "COMPLETED_SUCCESS":{
+    "name": "JobName",
+    "url": "JobUrl",
+    "build": {
+      number: 69,
+      queue_id: 69,
+      phase: 'COMPLETED',
+      status: 'SUCCESS',
+      url: 'job/Jobname/69/',
+      scm: {},
+      log: 'Started by user admin\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\nBuilding in workspace /var/jenkins_home/workspace/Jobname\n[Jobname] $ /bin/sh -xe /tmp/hudson5174919973359476640.sh\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\n',
+      artifacts: {}
+    }
+  },
+  "COMPLETED_FAILURE":{
+    "name": "JobName",
+    "url": "JobUrl",
+    "build": {
+      number: 70,
+      queue_id: 70,
+      phase: 'COMPLETED',
+      status: 'FAILURE',
+      url: 'job/Jobname/70/',
+      scm: {},
+      log: 'Started by user admin\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\nBuilding in workspace /var/jenkins_home/workspace/Jobname\n[Jobname] $ /bin/sh -xe /tmp/hudson326640172349901710.sh\n+ fail and break this build!\n/tmp/hudson326640172349901710.sh: 3: /tmp/hudson326640172349901710.sh: fail: not found\nBuild step \'Execute shell\' marked build as failure\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\n',
+      artifacts: {}
+    }
+  },
+  "FINALIZED_SUCCESS":{
+    "name": "JobName",
+    "url": "JobUrl",
+    "build": {
+      number: 69,
+      queue_id: 69,
+      phase: 'FINALIZED',
+      status: 'SUCCESS',
+      url: 'job/Jobname/69/',
+      scm: {},
+      log: 'Started by user admin\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\nBuilding in workspace /var/jenkins_home/workspace/Jobname\n[Jobname] $ /bin/sh -xe /tmp/hudson5174919973359476640.sh\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\nFinished: SUCCESS\n',
+      artifacts: {}
+    }
+  },
+  "FINALIZED_FAILURE":{
+    "name": "JobName",
+    "url": "JobUrl",
+    "build": {
+      number: 70,
+      queue_id: 70,
+      phase: 'FINALIZED',
+      status: 'FAILURE',
+      url: 'job/Jobname/70/',
+      scm: {},
+      log: 'Started by user admin\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\nBuilding in workspace /var/jenkins_home/workspace/Jobname\n[Jobname] $ /bin/sh -xe /tmp/hudson326640172349901710.sh\n+ fail and break this build!\n/tmp/hudson326640172349901710.sh: 3: /tmp/hudson326640172349901710.sh: fail: not found\nBuild step \'Execute shell\' marked build as failure\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\nFinished: FAILURE\n',
+      artifacts: {}
+    }
+  },
   "FINISHED_FAILURE_fullURL": {
     "name": "JobName",
     "url": "JobUrl",
@@ -53,19 +122,6 @@ var commonBodies = {
       "phase": "FINISHED",
       "status": "SUCCESS",
       "url": "job/project name/5",
-      "parameters": {
-        "branch": "master"
-      }
-    }
-  },
-  "STARTED":{
-    "name": "JobName",
-    "url": "JobUrl",
-    "build": {
-      "number": 2,
-      "phase": "STARTED",
-      "url": "job/project name/5",
-      "full_url": "http://ci.jenkins.org/job/project name/5",
       "parameters": {
         "branch": "master"
       }
@@ -215,20 +271,26 @@ describe("JenkinsNotifierRequest.buildEnvelope", function() {
 });
 
 describe("JenkinsNotifier", function() {
-  Object.keys(commonBodies).forEach(function(field) {
-    it(field + " generic template", function() {
-      var res = {
-        status: function(code) { this.code = code; return this; },
-        end: function(msg) { this.msg = msg; return this; },
-      };
+  [null, ''].concat(Object.keys(commonBodies).map(function(field) { 
+    return commonBodies[field].build.status;
+  })).forEach(function(oldState) {
+    Object.keys(commonBodies).forEach(function(field) {
+      it(field + " generic template", function() {
+        var res = {
+          status: function(code) { this.code = code; return this; },
+          end: function(msg) { this.msg = msg; return this; },
+        };
 
-      jenkinsNotifier.process({
-        url: "/hubot/jenkins-notify?room=%23halkeye&onStart=FS&onFinished=FS",
-        body: commonBodies.FINISHED_FAILURE
-      }, res);
+        jenkinsNotifier.statuses = {};
+        jenkinsNotifier.statuses[commonBodies[field].name] = oldState;
+        jenkinsNotifier.process({
+          url: "/hubot/jenkins-notify?room=%23halkeye&onStart=FS&onFinished=FS",
+          body: commonBodies[field]
+        }, res);
 
-      should(res.code).have.eql(200);
-      should(res.msg).have.eql('');
+        should(res.code).have.eql(200);
+        should(res.msg).have.eql('');
+      });
     });
   });
 });
