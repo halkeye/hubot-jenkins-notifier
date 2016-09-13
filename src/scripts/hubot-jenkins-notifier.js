@@ -168,7 +168,7 @@ JenkinsNotifierRequest.prototype.processStarted = function(data) {
   return [];
 }
 
-JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.prototype.onFinalized = function(data) {
+JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.prototype.processFinalized = function(data) {
   var build;
   if (data.build.status === 'FAILURE') {
     build = "started";
@@ -190,7 +190,7 @@ JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.protot
 
   if (data.build.status === 'SUCCESS') {
     build = "succeeded";
-    if (this.lastStatus[data.name] === 'FAILURE') {
+    if (this.status === 'FAILURE') {
       build = "was restored";
     }
     this.emit('handleSuccess', data.name);
