@@ -11,8 +11,8 @@ Notifies about Jenkins build errors via [Jenkins Notification Plugin](https://wi
 2. Add it `hubot-jenkins-notifier` to your external-scripts.json file in your hubot directory
 3. Add hubot's endpoint to jenkins jobs: (see Screenshot)
  1. Configure it to be JSON, HTTP and either "All events", "Job started" or "Job finalized". "Job completed" will be ignored.
- 2. To send to a room: `http://<hubot-host>:<hubot-port>/hubot/jenkins-notify?room=<room>` 
- 3. To send to a user: `http://<hubot-host>:<hubot-port>/hubot/jenkins-notify?user=<username>` 
+ 2. To send to a room: `http://<hubot-host>:<hubot-port>/hubot/jenkins-notify?room=<room>`
+ 3. To send to a user: `http://<hubot-host>:<hubot-port>/hubot/jenkins-notify?user=<username>`
  4. Add log lines if you want to
 
 ### Screenshot
@@ -23,7 +23,11 @@ As url parameters the following can be used:
 
 * `room`: The room name to send the message to. Mutually exlusive with `user`
 * `user`: The user name to send the private message to. Mutually exlusive with `room`
-* `onStart`/`onFinished`: Notification strategy: [Ff][Ss] which stands for "Failure" and "Success". Capitalized letter means: notify always. Small letter means: notify only if buildstatus has changed
+* `onStart`/`onFinished`:
+** Notification strategy: [Ff][Ss] which stands for "Failure" and "Success".
+** Capitalized letter means: notify always.
+** Small letter means: notify only if buildstatus has changed
+** *Default*: onStart=, onFinished=Fs
 * `trace`: add a bunch of runtime console.log's
 
 Environment variable:
@@ -32,7 +36,7 @@ Environment variable:
 
 ## Release History
 
-1.0.0 - 2016-09-05
+1.0.0 - 2016-09-27
 
 * Added parameter `user`, `trace`
 * Updated documentation to reflect changes in jenkins notification plugin
