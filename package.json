@@ -27,13 +27,18 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
+    "codacy": "istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | codacy-coverage && rm -rf ./coverage",
+    "coverage": "istanbul cover _mocha",
     "test": "mocha"
   },
   "devDependencies": {
+    "codacy-coverage": "^2.0.0",
     "coffee-script": "^1.10.0",
     "eslint": "^3.4.0",
     "hubot": "~2.19.0",
+    "istanbul": "^0.4.5",
     "mocha": "^3.0.2",
+    "mocha-lcov-reporter": "^1.2.0",
     "should": "~11.1.0",
     "sinon": "~1.17.5",
     "supertest": "~2.0.0"
