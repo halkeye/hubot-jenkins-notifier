@@ -223,6 +223,18 @@ describe("JenkinsNotifier.shouldNotify", function() {
         notifier.setQuery({onFinished: 'F' });
         should(notifier.shouldNotify(commonBodies.FINISHED_SUCCESS)).be.false();
     });
+    it("previous job failure, and onFinished=s", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("FAILURE");
+        notifier.setQuery({onFinished: 'Fs' });
+        should(notifier.shouldNotify(commonBodies.FINISHED_SUCCESS)).be.true();
+    });
+    it("previous job success, and onFinished=s", function() {
+        var notifier = new JenkinsNotifierRequest();
+        notifier.setStatus("SUCCESS");
+        notifier.setQuery({onFinished: 'Fs' });
+        should(notifier.shouldNotify(commonBodies.FINISHED_SUCCESS)).be.false();
+    });
   });
 });
 
@@ -271,7 +283,7 @@ describe("JenkinsNotifierRequest.buildQueryObject", function() {
 });
 
 describe("JenkinsNotifier", function() {
-  [null, ''].concat(Object.keys(commonBodies).map(function(field) { 
+  [null, ''].concat(Object.keys(commonBodies).map(function(field) {
     return commonBodies[field].build.status;
   })).forEach(function(oldState) {
     Object.keys(commonBodies).forEach(function(field) {
@@ -313,6 +325,12 @@ var test_data = [
     "expected_out": ["JobName build #2 started: http://ci.jenkins.org/job/project name/5"],
     "previousBuildFailed": true,
     "body": commonBodies.STARTED
+  }, {
+    "name": "finished-with-previous-failed-default",
+    "expected_out": ["JobName build #69 was restored: job/Jobname/69/"],
+    "onFinished": "Fs",
+    "previousBuildFailed": true,
+    "body": commonBodies.FINALIZED_SUCCESS
   }
 ];
 test_data.forEach(function(test) {
@@ -325,7 +343,7 @@ test_data.forEach(function(test) {
         this.notifier.setStatus("FAILURE");
       }
       this.notifier.setQuery(JenkinsNotifierRequest.buildQueryObject(
-        "/hubot/jenkins-notify?room=%23halkeye&onStart=FS&onFinished=FS"
+        '/hubot/jenkins-notify?room=%23halkeye&onStart=' + (test.onStart || 'FS') + '&onFinished=' + (test.onFinished || 'FS')
       ));
       this.messages = this.notifier.process(test.body);
     });

@@ -198,7 +198,7 @@ JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.protot
     }
     this.emit('handleSuccess', data.name);
 
-    if (/S/.test(this.query.onFinished)) {
+    if (this.shouldNotify(data)) {
       return [data.name + " build #" + data.build.number + " " + build + ": " + this.getFullUrl(data)];
     } else {
       this.logMessage("Not sending message, not necessary");
@@ -275,7 +275,7 @@ var JenkinsNotifier = (function() {
       /* Send out all the messages */
       var envelope = JenkinsNotifierRequest.buildEnvelope(notifier.getQuery());
       lodash.forEach(messages, function(msg) {
-        this.robot.send(envelope, msg); 
+        this.robot.send(envelope, msg);
       }.bind(this));
 
       res.status(200).end('');
