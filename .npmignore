@@ -9,3 +9,5 @@ grunt.js
 src/test
 
 out/
+coverage/
+test.js
