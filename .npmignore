@@ -11,3 +11,6 @@ src/test
 out/
 coverage/
 test.js
+test.sh
+test/
+.envrc
