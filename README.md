@@ -36,7 +36,7 @@ Environment variable:
 
 ## Release History
 
-1.0.0 - 2016-09-27
+1.0.0 - 2016-10-07
 
 * Added parameter `user`, `trace`
 * Updated documentation to reflect changes in jenkins notification plugin
