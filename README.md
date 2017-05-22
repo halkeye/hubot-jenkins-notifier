@@ -36,7 +36,11 @@ Environment variable:
 
 ## Release History
 
-1.0.0 - 2016-09-27
+1.1.0 - 2017-04-25
+
+* Treat unstable as failure - https://github.com/halkeye/hubot-jenkins-notifier/issues/19
+
+1.0.0 - 2016-10-07
 
 * Added parameter `user`, `trace`
 * Updated documentation to reflect changes in jenkins notification plugin

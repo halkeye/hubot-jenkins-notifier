@@ -126,7 +126,7 @@ JenkinsNotifierRequest.prototype.shouldNotify = function(data) {
   
   if (data.build.phase === 'STARTED') {
     // last job was a failure 
-    if (this.status === 'FAILURE') {
+    if (this.status === 'FAILURE' || this.status === 'UNSTABLE') {
       if (/F/.test(this.query.onStart)) {
         return true;
       }
@@ -143,7 +143,7 @@ JenkinsNotifierRequest.prototype.shouldNotify = function(data) {
     }
   }
 
-  if (data.build.status === 'FAILURE') {
+  if (data.build.status === 'FAILURE' || data.build.status === 'UNSTABLE') {
     if (/F/.test(this.query.onFinished)) {
       return true
     }
@@ -173,9 +173,9 @@ JenkinsNotifierRequest.prototype.processStarted = function(data) {
 
 JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.prototype.processFinalized = function(data) {
   var build;
-  if (data.build.status === 'FAILURE') {
+  if (data.build.status === 'FAILURE' || data.build.status === 'UNSTABLE') {
     build = "started";
-    if (this.status === 'FAILURE') {
+    if (this.status === 'FAILURE' || this.status === 'UNSTABLE') {
       build = "is still";
     }
     this.emit('handleFailed', data.name);
@@ -193,7 +193,7 @@ JenkinsNotifierRequest.prototype.processFinished = JenkinsNotifierRequest.protot
 
   if (data.build.status === 'SUCCESS') {
     build = "succeeded";
-    if (this.status === 'FAILURE') {
+    if (this.status === 'FAILURE' || this.status === 'UNSTABLE') {
       build = "was restored";
     }
     this.emit('handleSuccess', data.name);

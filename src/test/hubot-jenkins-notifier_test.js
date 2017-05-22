@@ -61,6 +61,20 @@ var commonBodies = {
       artifacts: {}
     }
   },
+  "COMPLETED_UNSTABLE":{
+    "name": "JobName",
+    "url": "JobUrl",
+    "build": {
+      number: 70,
+      queue_id: 70,
+      phase: 'COMPLETED',
+      status: 'UNSTABLE',
+      url: 'job/Jobname/70/',
+      scm: {},
+      log: 'Started by user admin\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\nBuilding in workspace /var/jenkins_home/workspace/Jobname\n[Jobname] $ /bin/sh -xe /tmp/hudson326640172349901710.sh\n+ fail and break this build!\n/tmp/hudson326640172349901710.sh: 3: /tmp/hudson326640172349901710.sh: fail: not found\nBuild step \'Execute shell\' marked build as failure\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\n',
+      artifacts: {}
+    }
+  },
   "FINALIZED_SUCCESS":{
     "name": "JobName",
     "url": "JobUrl",
@@ -86,6 +100,19 @@ var commonBodies = {
       url: 'job/Jobname/70/',
       scm: {},
       log: 'Started by user admin\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\nBuilding in workspace /var/jenkins_home/workspace/Jobname\n[Jobname] $ /bin/sh -xe /tmp/hudson326640172349901710.sh\n+ fail and break this build!\n/tmp/hudson326640172349901710.sh: 3: /tmp/hudson326640172349901710.sh: fail: not found\nBuild step \'Execute shell\' marked build as failure\nNotifying endpoint \'HTTP:http://192.168.168.128:9001/hubot/jenkins-notify?room=general&always_notify=1&trace=1\'\nFinished: FAILURE\n',
+      artifacts: {}
+    }
+  },
+  "FINALIZED_UNSTABLE":{
+    "name": "JobName",
+    "url": "JobUrl",
+    "build": {
+      number: 70,
+      queue_id: 70,
+      phase: 'FINALIZED',
+      status: 'UNSTABLE',
+      url: 'job/Jobname/70/',
+      scm: {},
       artifacts: {}
     }
   },
@@ -331,6 +358,12 @@ var test_data = [
     "onFinished": "Fs",
     "previousBuildFailed": true,
     "body": commonBodies.FINALIZED_SUCCESS
+  }, {
+    "name": "unstable-with-previous-failed-default",
+    "expected_out": ["JobName build #70 started failing: job/Jobname/70/"],
+    "onFinished": "FS",
+    "previousBuildFailed": false,
+    "body": commonBodies.FINALIZED_UNSTABLE
   }
 ];
 test_data.forEach(function(test) {

@@ -1,7 +1,7 @@
 {
   "name": "hubot-jenkins-notifier",
   "description": "Notifies about Jenkins build errors via Jenkins Notification Plugin",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "license": "MIT",
   "homepage": "https://github.com/halkeye/hubot-jenkins-notifier",
   "author": {
@@ -40,7 +40,7 @@
     "mocha": "^3.0.2",
     "mocha-lcov-reporter": "^1.2.0",
     "should": "~11.2.1",
-    "sinon": "~2.1.0",
+    "sinon": "~2.2.0",
     "supertest": "~3.0.0"
   },
   "keywords": [
