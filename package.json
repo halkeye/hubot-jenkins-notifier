@@ -34,7 +34,7 @@
   "devDependencies": {
     "codacy-coverage": "^2.0.0",
     "coffee-script": "^1.10.0",
-    "eslint": "^3.4.0",
+    "eslint": "^4.1.0",
     "hubot": "~2.19.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.0.2",
