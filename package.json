@@ -35,7 +35,7 @@
     "codacy-coverage": "^2.0.0",
     "coffee-script": "^1.10.0",
     "eslint": "^4.1.0",
-    "hubot": "~2.19.0",
+    "hubot": "~3.0.0",
     "istanbul": "^0.4.5",
     "mocha": "^3.0.2",
     "mocha-lcov-reporter": "^1.2.0",
