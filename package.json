@@ -40,7 +40,7 @@
     "mocha": "^3.0.2",
     "mocha-lcov-reporter": "^1.2.0",
     "should": "~11.2.1",
-    "sinon": "~2.4.1",
+    "sinon": "~3.0.0",
     "supertest": "~3.0.0"
   },
   "keywords": [
