@@ -39,7 +39,7 @@
     "istanbul": "^0.4.5",
     "mocha": "^3.0.2",
     "mocha-lcov-reporter": "^1.2.0",
-    "should": "~13.0.0",
+    "should": "~13.1.0",
     "sinon": "~3.3.0",
     "supertest": "~3.0.0"
   },
