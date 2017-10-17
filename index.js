@@ -1,8 +1,8 @@
 var path = require('path');
 
-module.exports = function(robot) {
-  var scripts_path = path.resolve(__dirname, 'src/scripts');
+module.exports = function (robot) {
+  var scriptsPath = path.resolve(__dirname, 'src/scripts');
   return [
-    robot.loadFile(scripts_path, 'hubot-confluence-search.js')
+    robot.loadFile(scriptsPath, 'hubot-confluence-search.js')
   ];
 };

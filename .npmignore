@@ -14,3 +14,4 @@ test.js
 test.sh
 test/
 .envrc
+package-lock.json
