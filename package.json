@@ -33,7 +33,7 @@
     "test": "mocha"
   },
   "devDependencies": {
-    "codacy-coverage": "^2.0.0",
+    "codacy-coverage": "^3.0.0",
     "coffee-script": "^1.10.0",
     "eslint": "^4.1.0",
     "eslint-config-standard": "^11.0.0",
