@@ -42,7 +42,7 @@
     "eslint-plugin-node": "^8.0.0",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "hubot": "~3.2.0",
+    "hubot": "~3.3.0",
     "hubot-test-helper": "^1.9.0",
     "istanbul": "^0.4.5",
     "mocha": "^5.2.0",
