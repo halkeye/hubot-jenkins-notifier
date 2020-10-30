@@ -36,7 +36,7 @@
     "codacy-coverage": "^3.0.0",
     "coffee-script": "^1.12.7",
     "eslint": "^7.3.0",
-    "eslint-config-standard": "^15.0.1",
+    "eslint-config-standard": "^16.0.0",
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-mocha": "^6.0.0",
     "eslint-plugin-node": "^11.0.0",
