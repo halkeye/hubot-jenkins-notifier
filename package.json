@@ -49,7 +49,7 @@
     "mocha-lcov-reporter": "^1.3.0",
     "should": "~13.2.3",
     "sinon": "~9.0.0",
-    "supertest": "~6.0.0"
+    "supertest": "~6.1.3"
   },
   "keywords": [
     "hubot",
