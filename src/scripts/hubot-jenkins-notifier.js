@@ -1,10 +1,6 @@
 //
 // Notifies about Jenkins build errors via Jenkins Notification Plugin
 //
-// Dependencies:
-//   "url": ""
-//   "querystring": ""
-//
 // Configuration:
 //   Make jenkins hit <HUBOT_URL>:<PORT>/hubot/jenkins-notify?room=<room>
 //   or <HUBOT_URL>:<PORT>/hubot/jenkins-notify?user=<user>
@@ -36,12 +32,10 @@
 
 'use strict';
 
-const url = require('url');
-const querystring = require('querystring');
 const util = require('util');
 const EventEmitter = require('events').EventEmitter;
 
-const ucFirst = (str) => str.charAt(0).toUpperCase() + name.slice(1);
+const ucFirst = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const JenkinsNotifierRequest = function () {
   this.query = {};
@@ -51,7 +45,8 @@ const JenkinsNotifierRequest = function () {
 util.inherits(JenkinsNotifierRequest, EventEmitter);
 
 JenkinsNotifierRequest.buildQueryObject = function (urlStr) {
-  const query = querystring.parse(url.parse(urlStr).query);
+  const parsed = new URL(urlStr, 'https://example.com');
+  const query = Object.fromEntries(parsed.searchParams);
 
   if (typeof query.onStart === 'undefined' && typeof query.onFinished === 'undefined') {
     if (query.notstrat) {
