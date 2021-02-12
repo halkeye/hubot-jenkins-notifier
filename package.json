@@ -56,9 +56,6 @@
     "hubot-scripts",
     "jenkins"
   ],
-  "dependencies": {
-    "lodash": "^4.17.20"
-  },
   "mocha": {
     "require": [
       "should"
