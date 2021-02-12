@@ -58,5 +58,13 @@
   ],
   "dependencies": {
     "lodash": "^4.17.10"
+  },
+  "mocha": {
+    "require": [
+      "should"
+    ],
+    "recursive": true,
+    "reporter": "spec",
+    "spec": "src/test/**/*.js"
   }
 }
